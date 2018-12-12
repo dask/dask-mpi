@@ -1,0 +1,2 @@
+include versioneer.py
+include dask_mpi/_version.py

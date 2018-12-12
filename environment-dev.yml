@@ -1,0 +1,10 @@
+name: dask-mpi-dev
+dependencies:
+  - dask
+  - distributed
+  - mpi4py
+  - yaml
+  - six
+  - versioneer
+  - pytest
+  - coverage
