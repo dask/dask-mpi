@@ -12,7 +12,7 @@ for more details.
 LICENSE
 -------
 
-BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LICENSE.txt>`__.)
+BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LICENSE.txt>`__)
 
 .. _documentation:
 .. |Gitter| image:: https://badges.gitter.im/Join%20Chat.svg
