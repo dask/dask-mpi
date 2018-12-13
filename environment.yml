@@ -3,5 +3,3 @@ dependencies:
   - dask
   - distributed
   - mpi4py
-  - yaml
-  - six
