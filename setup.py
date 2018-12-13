@@ -1,7 +1,7 @@
 import versioneer
 import yaml
-from six import string_types
 
+from six import string_types
 from os.path import exists
 from setuptools import setup
 
