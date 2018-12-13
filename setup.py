@@ -35,11 +35,18 @@ setup(name='dask-mpi',
       version=versioneer.get_version(),
       cmdclass=versioneer.get_cmdclass(),
       description='Deploy Dask using mpi4py',
-      url='https://github.com/dask/dask-mpi',
+      url='https://github.com/dask/dask-mpi',  # TODO: Update to docs when docs complete
+      maintainer='Kevin Paul',
+      maintainer_email='kpaul@ucar.edu',
       license='BSD 3-Clause',
-      packages=['dask_mpi'],
       include_package_data=True,
       install_requires=install_requires,
       tests_require=['pytest >= 2.7.1'],
+      packages=['dask_mpi',
+                'dask_mpi.cli'],
       long_description=long_description,
+      entry_points="""
+            [console_scripts]
+            dask-mpi=dask_mpi.cli.dask_mpi:go
+            """,
       zip_safe=False)
