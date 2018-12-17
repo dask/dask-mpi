@@ -41,11 +41,13 @@ def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
     host = get_host_from_interface(interface)
 
     if rank == 0 and scheduler:
-        start_scheduler(host, loop, scheduler_file, bokeh_port, bokeh_prefix)
+        start_scheduler(loop, host=host, scheduler_file=scheduler_file,
+                        bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
     else:
         name = rank if scheduler else None
-        start_worker(host, loop, name, scheduler_file, nanny, local_directory,
-                     nthreads, memory_limit, bokeh_worker_port)
+        start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
+                     local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
+                     bokeh_worker_port=bokeh_worker_port)
 
 
 def go():

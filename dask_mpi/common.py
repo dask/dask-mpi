@@ -15,7 +15,8 @@ def get_host_from_interface(interface=None):
     return host
 
 
-def start_scheduler(host, loop, scheduler_file, bokeh_port, bokeh_prefix):
+def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
+                    bokeh_port=8787, bokeh_prefix=None):
     try:
         from distributed.bokeh.scheduler import BokehScheduler
     except ImportError:
@@ -34,8 +35,8 @@ def start_scheduler(host, loop, scheduler_file, bokeh_port, bokeh_prefix):
         scheduler.stop()
 
 
-def start_worker(host, loop, name, scheduler_file, nanny, local_directory,
-                 nthreads, memory_limit, bokeh_worker_port):
+def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json', nanny=True,
+                 local_directory='', nthreads=0, memory_limit='auto', bokeh_worker_port=8789):
     W = Nanny if nanny else Worker
     worker = W(scheduler_file=scheduler_file,
                loop=loop,
