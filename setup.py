@@ -45,6 +45,6 @@ setup(name='dask-mpi',
       long_description=long_description,
       entry_points="""
             [console_scripts]
-            dask-mpi=dask_mpi.dask_mpi:go
+            dask-mpi=dask_mpi.cli:go
             """,
       zip_safe=False)
