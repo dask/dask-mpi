@@ -111,3 +111,4 @@ venv.bak/
 # Dask files
 global.lock
 purge.lock
+/temp/
