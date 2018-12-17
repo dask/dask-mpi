@@ -15,14 +15,12 @@ from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
 
 
-
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
     with tmpfile() as fn:
         with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny],
                    stdin=subprocess.DEVNULL):
             with Client(scheduler_file=fn) as c:
-
                 start = time()
                 while len(c.scheduler_info()['workers']) != 3:
                     assert time() < start + 10
