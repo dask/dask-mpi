@@ -18,7 +18,7 @@ from distributed.utils_test import popen
 
 
 @pytest.mark.parametrize('nanny', ['0', '1'])
-def test_basic(nanny):
+def test_basic(loop, nanny):
     script_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'basic.py')
     with tmpfile(extension='json') as fn:
         with open('test_basic.out', 'w') as fo:
