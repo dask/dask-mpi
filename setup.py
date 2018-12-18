@@ -41,11 +41,10 @@ setup(name='dask-mpi',
       license='BSD 3-Clause',
       include_package_data=True,
       install_requires=install_requires,
-      packages=['dask_mpi',
-                'dask_mpi.cli'],
+      packages=['dask_mpi'],
       long_description=long_description,
       entry_points="""
             [console_scripts]
-            dask-mpi=dask_mpi.cli.dask_mpi:go
+            dask-mpi=dask_mpi.cli:go
             """,
       zip_safe=False)
