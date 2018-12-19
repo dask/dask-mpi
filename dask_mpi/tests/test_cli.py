@@ -49,7 +49,7 @@ def test_no_scheduler(loop):
                         assert time() < start + 10
                         sleep(0.2)
 
-
+@pytest.mark.skip
 def test_bokeh(loop):
     with tmpfile() as fn:
         with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn,
