@@ -14,15 +14,14 @@ from distributed import Client
 from distributed.utils import tmpfile
 from distributed.metrics import time
 from distributed.utils_test import popen
-#from distributed.utils_test import loop  # noqa: F401
+from distributed.utils_test import loop  # noqa: F401
 
 
-@pytest.mark.parametrize('nanny', ['0', '1'])
-def test_basic(loop, nanny):
+def test_basic(loop):
     script_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'basic.py')
     with tmpfile(extension='json') as fn:
         with open('test_basic.out', 'w') as fo:
-            p = subprocess.Popen(['mpirun', '-np', '4', sys.executable, script_file, fn, nanny],
+            p = subprocess.Popen(['mpirun', '-np', '4', sys.executable, script_file, fn],
                                  stdout=fo, stderr=subprocess.STDOUT)
             p.communicate()
             assert p.returncode == 0

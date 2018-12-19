@@ -30,12 +30,12 @@ def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
     scheduler.start(addr)
     try:
         loop.start()
-        loop.close()
     finally:
-        scheduler.stop()
+        loop.close()
+    scheduler.stop()
 
 
-def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json', nanny=True,
+def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json', nanny=False,
                  local_directory='', nthreads=0, memory_limit='auto', bokeh_worker_port=8789):
     W = Nanny if nanny else Worker
     worker = W(scheduler_file=scheduler_file,
@@ -48,19 +48,17 @@ def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json', na
     addr = uri_from_host_port(host, None, 0)
 
     @gen.coroutine
-    def run():
+    def run_until_closed():
         yield worker._start(addr)
         while worker.status != 'closed':
             yield gen.sleep(0.2)
 
     try:
-        loop.run_sync(run)
-        loop.close()
+        loop.run_sync(run_until_closed)
     finally:
-        pass
+        @gen.coroutine
+        def close():
+            yield worker._close(timeout=2)
+        loop.run_sync(close)
+        loop.close()
 
-    @gen.coroutine
-    def close():
-        yield worker._close(timeout=2)
-
-    loop.run_sync(close)
