@@ -31,6 +31,11 @@ def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
                           services=services)
     addr = uri_from_host_port(host, None, 8786)
     scheduler.start(addr)
+    return scheduler
+
+
+def start_scheduler_loop(scheduler):
+    loop = scheduler.loop
     try:
         loop.start()
     finally:
@@ -61,12 +66,17 @@ def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json',
                memory_limit=memory_limit)
     addr = uri_from_host_port(host, None, 0)
 
+    return worker, addr
+
+
+def start_worker_loop(worker, addr):
     @gen.coroutine
     def run_until_closed():
         yield worker._start(addr)
         while worker.status != 'closed':
             yield gen.sleep(0.2)
 
+    loop = worker.loop
     try:
         loop.run_sync(run_until_closed)
     finally:

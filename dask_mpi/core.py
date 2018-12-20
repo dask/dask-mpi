@@ -3,7 +3,9 @@ import sys
 from mpi4py import MPI
 from tornado.ioloop import IOLoop
 
-from dask_mpi.common import get_host_from_interface, start_scheduler, start_worker
+from dask_mpi.common import (get_host_from_interface,
+                             start_scheduler, start_scheduler_loop,
+                             start_worker, start_worker_loop)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -16,15 +18,17 @@ def initialize(scheduler_file='scheduler.json', interface=None, nthreads=1,
     host = get_host_from_interface(interface)
 
     if rank == 0:
-        start_scheduler(loop, host=host, scheduler_file=scheduler_file,
-                        bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        scheduler = start_scheduler(loop, host=host, scheduler_file=scheduler_file,
+                                    bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        start_scheduler_loop(scheduler)
         sys.exit()
 
     elif rank == 1:
         pass
 
     else:
-        start_worker(loop, host=host, name=rank-1, scheduler_file=scheduler_file, nanny=nanny,
-                     local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
-                     bokeh=bokeh, bokeh_port=bokeh_worker_port)
+        worker, addr = start_worker(loop, host=host, name=rank-1, scheduler_file=scheduler_file, nanny=nanny,
+                                    local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
+                                    bokeh=bokeh, bokeh_port=bokeh_worker_port)
+        start_worker_loop(worker, addr)
         sys.exit()

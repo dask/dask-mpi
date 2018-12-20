@@ -4,7 +4,9 @@ from tornado.ioloop import IOLoop
 
 from distributed.cli.utils import check_python_3
 
-from dask_mpi.common import get_host_from_interface, start_scheduler, start_worker
+from dask_mpi.common import (get_host_from_interface,
+                             start_scheduler, start_scheduler_loop,
+                             start_worker, start_worker_loop)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -43,13 +45,15 @@ def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
     host = get_host_from_interface(interface)
 
     if rank == 0 and scheduler:
-        start_scheduler(loop, host=host, scheduler_file=scheduler_file,
-                        bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        scheduler = start_scheduler(loop, host=host, scheduler_file=scheduler_file,
+                                    bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        start_scheduler_loop(scheduler)
     else:
         name = rank if scheduler else None
-        start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
-                     local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
-                     bokeh=bokeh, bokeh_port=bokeh_worker_port)
+        worker, addr = start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
+                                    local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
+                                    bokeh=bokeh, bokeh_port=bokeh_worker_port)
+        start_worker_loop(worker, addr)
 
 
 def go():
