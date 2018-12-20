@@ -14,8 +14,7 @@ from distributed.utils_test import loop  # noqa: F401
 def test_basic(loop):
     script_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'basic.py')
     with tmpfile(extension='json') as fn:
-        with open('test_basic.out', 'w') as fo:
-            p = subprocess.Popen(['mpirun', '-np', '4', sys.executable, script_file, fn],
-                                 stdout=fo, stderr=subprocess.STDOUT)
-            p.communicate()
-            assert p.returncode == 0
+        p = subprocess.Popen(['mpirun', '-np', '4', sys.executable, script_file, fn],
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (stdout, _) = p.communicate()
+        assert p.returncode == 0
