@@ -16,6 +16,7 @@ workflows:
                 - master
 
 jobs:
+
   test-2.7:
     docker:
       - image: frolvlad/alpine-miniconda3
@@ -40,6 +41,7 @@ jobs:
            name: Coverage
            command: source activate dask-mpi-dev && codecov
            when: on_success
+
   test-3.6:
     docker:
       - image: frolvlad/alpine-miniconda3
