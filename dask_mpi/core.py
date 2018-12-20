@@ -34,20 +34,23 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     elif rank == 1:
         return
     else:
-        create_and_run_worker(loop, host=host, rank=rank, nanny=nanny,  nthreads=nthreads,
-                              local_directory=local_directory,memory_limit=memory_limit,
+        create_and_run_worker(loop, host=host, rank=rank, nanny=nanny, nthreads=nthreads,
+                              local_directory=local_directory, memory_limit=memory_limit,
                               bokeh=bokeh, bokeh_port=bokeh_worker_port)
         sys.exit()
 
 
+def send_close_signal():
+    @gen.coroutine
+    def stop(dask_scheduler):
+        yield dask_scheduler.close()
+        yield gen.sleep(0.1)
+        local_loop = dask_scheduler.loop
+        local_loop.add_callback(local_loop.stop)
+
+    with Client() as c:
+        c.run_on_scheduler(stop, wait=False)
+
+
 if rank == 1:
-    @atexit.register
-    def send_close_signal():
-        @gen.coroutine
-        def stop(dask_scheduler):
-            yield dask_scheduler.close()
-            yield gen.sleep(0.1)
-            local_loop = dask_scheduler.loop
-            local_loop.add_callback(local_loop.stop)
-        with Client() as c:
-            c.run_on_scheduler(stop, wait=False)
+    atexit.register(send_close_signal)
