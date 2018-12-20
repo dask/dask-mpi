@@ -12,6 +12,7 @@ scheduler_file = sys.argv[1]
 initialize(scheduler_file=scheduler_file)
 
 with Client(scheduler_file=scheduler_file) as c:
+
     start = time()
     while len(c.scheduler_info()['workers']) != 2:
         assert time() < start + 10
