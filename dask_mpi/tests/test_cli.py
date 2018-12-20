@@ -9,20 +9,22 @@ pytest.importorskip('mpi4py')
 import requests
 
 from distributed import Client
-from distributed.utils import tmpfile
 from distributed.metrics import time
+from distributed.utils import tmpfile
 from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
 
 
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
-    with tmpfile() as fn:
-        with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny],
-                   stdin=subprocess.DEVNULL):
+    with tmpfile(extension='json') as fn:
+        with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny], stdin=subprocess.DEVNULL):
             with Client(scheduler_file=fn) as c:
                 start = time()
-                while len(c.scheduler_info()['workers']) != 3:
+                n_workers = len(c.scheduler_info()['workers'])
+                while n_workers != 3:
+                    n_workers = len(c.scheduler_info()['workers'])
+                    print(f'n_workers = {n_workers}')
                     assert time() < start + 10
                     sleep(0.2)
 
@@ -30,9 +32,8 @@ def test_basic(loop, nanny):
 
 
 def test_no_scheduler(loop):
-    with tmpfile() as fn:
-        with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn],
-                   stdin=subprocess.DEVNULL):
+    with tmpfile(extension='json') as fn:
+        with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=subprocess.DEVNULL):
             with Client(scheduler_file=fn) as c:
 
                 start = time()
@@ -41,8 +42,7 @@ def test_no_scheduler(loop):
                     sleep(0.2)
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
-                with popen(['mpirun', '--np', '1', 'dask-mpi',
-                            '--scheduler-file', fn, '--no-scheduler']):
+                with popen(['mpirun', '--np', '1', 'dask-mpi', '--scheduler-file', fn, '--no-scheduler']):
 
                     start = time()
                     while len(c.scheduler_info()['workers']) != 2:
@@ -51,7 +51,7 @@ def test_no_scheduler(loop):
 
 @pytest.mark.skip
 def test_bokeh(loop):
-    with tmpfile() as fn:
+    with tmpfile(extension='json') as fn:
         with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn,
                     '--bokeh-port', '59583', '--bokeh-worker-port', '59584'],
                    stdin=subprocess.DEVNULL):
@@ -67,5 +67,5 @@ def test_bokeh(loop):
                         sleep(0.1)
                         assert time() < start + 20
 
-    with pytest.raises(Exception):
-        requests.get('http://localhost:59583/status/')
+        with pytest.raises(Exception):
+            requests.get('http://localhost:59583/status/')

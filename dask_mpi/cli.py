@@ -1,12 +1,13 @@
 import click
+import dask
+
 from mpi4py import MPI
 from tornado.ioloop import IOLoop
-
 from distributed.cli.utils import check_python_3
 
-from dask_mpi.common import (get_host_from_interface, get_worker_name_from_mpi_rank,
-                             start_scheduler, start_scheduler_loop,
-                             start_worker, start_worker_loop)
+from dask_mpi.common import (get_host_from_interface,
+                             create_scheduler, run_scheduler,
+                             create_and_run_worker)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -45,15 +46,13 @@ def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
     host = get_host_from_interface(interface)
 
     if rank == 0 and scheduler:
-        scheduler = start_scheduler(loop, host=host, scheduler_file=scheduler_file,
-                                    bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
-        start_scheduler_loop(scheduler)
+        scheduler_obj = create_scheduler(loop, host=host, scheduler_file=scheduler_file,
+                                         bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        run_scheduler(scheduler_obj)
     else:
-        name = get_worker_name_from_mpi_rank(rank) if scheduler else None
-        worker, addr = start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
-                                    local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
-                                    bokeh=bokeh, bokeh_port=bokeh_worker_port)
-        start_worker_loop(worker, addr)
+        create_and_run_worker(loop, host=host, rank=rank, scheduler_file=scheduler_file, nanny=nanny,
+                              nthreads=nthreads, local_directory=local_directory, memory_limit=memory_limit,
+                              bokeh=bokeh, bokeh_port=bokeh_worker_port)
 
 
 def go():

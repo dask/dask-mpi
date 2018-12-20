@@ -14,12 +14,7 @@ def get_host_from_interface(interface=None):
     return host
 
 
-def get_worker_name_from_mpi_rank(rank):
-    return f'mpi-rank-{rank}'
-
-
-def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
-                    bokeh=True, bokeh_port=8787, bokeh_prefix=None):
+def create_scheduler(loop, scheduler_file=None, host=None, bokeh=True, bokeh_port=8787, bokeh_prefix=None):
     try:
         from distributed.bokeh.scheduler import BokehScheduler
     except ImportError:
@@ -30,15 +25,13 @@ def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
     else:
         services = {}
 
-    scheduler = Scheduler(scheduler_file=scheduler_file,
-                          loop=loop,
-                          services=services)
+    scheduler = Scheduler(loop=loop, services=services, scheduler_file=scheduler_file)
     addr = uri_from_host_port(host, None, 8786)
     scheduler.start(addr)
     return scheduler
 
 
-def start_scheduler_loop(scheduler):
+def run_scheduler(scheduler):
     loop = scheduler.loop
     try:
         loop.start()
@@ -47,9 +40,9 @@ def start_scheduler_loop(scheduler):
     scheduler.stop()
 
 
-def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json',
-                 nanny=False, local_directory='', nthreads=0, memory_limit='auto',
-                 bokeh=True, bokeh_port=8789, bokeh_prefix=None):
+def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=False,
+                          local_directory='', nthreads=0, memory_limit='auto',
+                          bokeh=True, bokeh_port=8789, bokeh_prefix=None):
     try:
         from distributed.bokeh.worker import BokehWorker
     except ImportError:
@@ -63,17 +56,13 @@ def start_worker(loop, host=None, name=None, scheduler_file='scheduler.json',
     W = Nanny if nanny else Worker
     worker = W(scheduler_file=scheduler_file,
                loop=loop,
-               name=name,
+               name=f'mpi-rank-{rank}',
                ncores=nthreads,
                local_dir=local_directory,
                services=services,
                memory_limit=memory_limit)
     addr = uri_from_host_port(host, None, 0)
 
-    return worker, addr
-
-
-def start_worker_loop(worker, addr):
     @gen.coroutine
     def run_until_closed():
         yield worker._start(addr)

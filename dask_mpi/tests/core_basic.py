@@ -1,17 +1,12 @@
-import sys
-
 from time import sleep
 from distributed import Client
 from distributed.metrics import time
-from tornado import gen
 
 from dask_mpi.core import initialize
 
-scheduler_file = sys.argv[1]
+initialize()
 
-initialize(scheduler_file=scheduler_file)
-
-with Client(scheduler_file=scheduler_file) as c:
+with Client() as c:
 
     start = time()
     while len(c.scheduler_info()['workers']) != 2:
@@ -19,10 +14,3 @@ with Client(scheduler_file=scheduler_file) as c:
         sleep(0.2)
 
     assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-2').result() == 11
-
-    async def stop(dask_scheduler):
-        await dask_scheduler.close()
-        await gen.sleep(0.1)
-        loop = dask_scheduler.loop
-        loop.add_callback(loop.stop)
-    c.run_on_scheduler(stop, wait=False)
