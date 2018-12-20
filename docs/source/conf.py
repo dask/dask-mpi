@@ -15,18 +15,19 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import dask_mpi
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Dask-mpi'
-copyright = '2018, Anaconda, Inc.'
-author = 'Anaconda, Inc.'
+project = 'Dask-MPI'
+copyright = '2018, Anaconda, Inc. and contributors'
+author = 'Dask-MPI Development Team'
 
 # The short X.Y version
-version = ''
+version = dask_mpi.__version__
 # The full version, including alpha/beta/rc tags
-release = ''
+release = dask_mpi.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,7 +45,14 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx.ext.extlinks',
+    'numpydoc'
 ]
+
+autosummary_generate = True
+
+numpydoc_class_members_toctree = True
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,10 +76,10 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -79,7 +87,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'dask_sphinx_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -133,8 +141,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Dask-mpi.tex', 'Dask-mpi Documentation',
-     'Anaconda, Inc.', 'manual'),
+    (master_doc, 'dask-mpi.tex', 'Dask-mpi Documentation',
+     [author], 'manual'),
 ]
 
 
@@ -154,7 +162,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Dask-mpi', 'Dask-mpi Documentation',
+    (master_doc, 'dask-mpi', 'Dask-mpi Documentation',
      author, 'Dask-mpi', 'One line description of project.',
      'Miscellaneous'),
 ]
@@ -183,9 +191,27 @@ epub_exclude_files = ['search.html']
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'numpy': ('https://docs.scipy.org/doc/numpy/',
+              'https://docs.scipy.org/doc/numpy/objects.inv'),
+    'dask': ('https://docs.dask.org/en/latest',
+             'https://docs.dask.org/en/latest/objects.inv'),
+    'distributed': ('https://distributed.dask.org/en/stable/',
+                    'https://distributed.dask.org/en/stable/objects.inv'),
+    'mpi4py': ('https://mpi4py.readthedocs.io/en/stable/',
+               'https://mpi4py.readthedocs.io/en/stable/objects.inv')
+}
 
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for extlinks extension ------------------------------------------
+
+# Link to GitHub issues and pull requests using :pr:`1234` and :issue:`1234`
+# syntax
+extlinks = {
+    'issue': ('https://github.com/dask/dask-mpi/issues/%s', 'GH#'),
+    'pr': ('https://github.com/dask/dask-mpi/pull/%s', 'GH#')
+}
