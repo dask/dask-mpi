@@ -1,15 +1,13 @@
-from functools import partial
-
 import click
+import dask
+
 from mpi4py import MPI
 from tornado.ioloop import IOLoop
-from tornado import gen
+from distributed.cli.utils import check_python_3
 
-from distributed import Scheduler, Nanny, Worker
-from distributed.bokeh.worker import BokehWorker
-from distributed.cli.utils import check_python_3, uri_from_host_port
-from distributed.utils import get_ip_interface
-
+from dask_mpi.common import (get_host_from_interface,
+                             create_scheduler, run_scheduler,
+                             create_and_run_worker)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -35,6 +33,8 @@ loop = IOLoop()
                     "Use --no-scheduler to increase an existing dask cluster"))
 @click.option('--nanny/--no-nanny', default=True,
               help="Start workers in nanny process for management")
+@click.option('--bokeh/--no-bokeh', default=True,
+              help="Enable Bokeh visual diagnostics")
 @click.option('--bokeh-port', type=int, default=8787,
               help="Bokeh port for visual diagnostics")
 @click.option('--bokeh-worker-port', type=int, default=8789,
@@ -42,58 +42,17 @@ loop = IOLoop()
 @click.option('--bokeh-prefix', type=str, default=None,
               help="Prefix for the bokeh app")
 def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
-         scheduler, bokeh_port, bokeh_prefix, nanny, bokeh_worker_port):
-    if interface:
-        host = get_ip_interface(interface)
-    else:
-        host = None
+         scheduler, bokeh, bokeh_port, bokeh_prefix, nanny, bokeh_worker_port):
+    host = get_host_from_interface(interface)
 
     if rank == 0 and scheduler:
-        try:
-            from distributed.bokeh.scheduler import BokehScheduler
-        except ImportError:
-            services = {}
-        else:
-            services = {('bokeh',  bokeh_port): partial(BokehScheduler,
-                                                        prefix=bokeh_prefix)}
-        scheduler = Scheduler(scheduler_file=scheduler_file,
-                              loop=loop,
-                              services=services)
-        addr = uri_from_host_port(host, None, 8786)
-        scheduler.start(addr)
-        try:
-            loop.start()
-            loop.close()
-        finally:
-            scheduler.stop()
+        scheduler_obj = create_scheduler(loop, host=host, scheduler_file=scheduler_file,
+                                         bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+        run_scheduler(scheduler_obj)
     else:
-        W = Nanny if nanny else Worker
-        worker = W(scheduler_file=scheduler_file,
-                   loop=loop,
-                   name=rank if scheduler else None,
-                   ncores=nthreads,
-                   local_dir=local_directory,
-                   services={('bokeh', bokeh_worker_port): BokehWorker},
-                   memory_limit=memory_limit)
-        addr = uri_from_host_port(host, None, 0)
-
-        @gen.coroutine
-        def run():
-            yield worker._start(addr)
-            while worker.status != 'closed':
-                yield gen.sleep(0.2)
-
-        try:
-            loop.run_sync(run)
-            loop.close()
-        finally:
-            pass
-
-        @gen.coroutine
-        def close():
-            yield worker._close(timeout=2)
-
-        loop.run_sync(close)
+        create_and_run_worker(loop, host=host, rank=rank, scheduler_file=scheduler_file, nanny=nanny,
+                              nthreads=nthreads, local_directory=local_directory, memory_limit=memory_limit,
+                              bokeh=bokeh, bokeh_port=bokeh_worker_port)
 
 
 def go():

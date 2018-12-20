@@ -107,3 +107,8 @@ venv.bak/
 
 # PyCharm files
 .idea/
+
+# Dask files
+global.lock
+purge.lock
+/temp/
