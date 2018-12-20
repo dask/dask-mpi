@@ -30,6 +30,8 @@ loop = IOLoop()
                     "Use --no-scheduler to increase an existing dask cluster"))
 @click.option('--nanny/--no-nanny', default=True,
               help="Start workers in nanny process for management")
+@click.option('--bokeh/--no-bokeh', default=True,
+              help="Enable Bokeh visual diagnostics")
 @click.option('--bokeh-port', type=int, default=8787,
               help="Bokeh port for visual diagnostics")
 @click.option('--bokeh-worker-port', type=int, default=8789,
@@ -37,17 +39,17 @@ loop = IOLoop()
 @click.option('--bokeh-prefix', type=str, default=None,
               help="Prefix for the bokeh app")
 def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
-         scheduler, bokeh_port, bokeh_prefix, nanny, bokeh_worker_port):
+         scheduler, bokeh, bokeh_port, bokeh_prefix, nanny, bokeh_worker_port):
     host = get_host_from_interface(interface)
 
     if rank == 0 and scheduler:
         start_scheduler(loop, host=host, scheduler_file=scheduler_file,
-                        bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+                        bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
     else:
         name = rank if scheduler else None
         start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
                      local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
-                     bokeh_worker_port=bokeh_worker_port)
+                     bokeh=bokeh, bokeh_port=bokeh_worker_port)
 
 
 def go():

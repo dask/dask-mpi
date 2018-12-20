@@ -10,14 +10,14 @@ rank = comm.Get_rank()
 loop = IOLoop()
 
 
-def initialize(scheduler_file='scheduler.json', interface=None, nthreads=1, local_directory='',
-               memory_limit='auto', nanny=False, bokeh_port=8787, bokeh_prefix=None,
-               bokeh_worker_port=8789):
+def initialize(scheduler_file='scheduler.json', interface=None, nthreads=1,
+               local_directory='', memory_limit='auto', nanny=False,
+               bokeh=True, bokeh_port=8787, bokeh_prefix=None, bokeh_worker_port=8789):
     host = get_host_from_interface(interface)
 
     if rank == 0:
         start_scheduler(loop, host=host, scheduler_file=scheduler_file,
-                        bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
+                        bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
         sys.exit()
 
     elif rank == 1:
@@ -26,5 +26,5 @@ def initialize(scheduler_file='scheduler.json', interface=None, nthreads=1, loca
     else:
         start_worker(loop, host=host, name=rank-1, scheduler_file=scheduler_file, nanny=nanny,
                      local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
-                     bokeh_worker_port=bokeh_worker_port)
+                     bokeh=bokeh, bokeh_port=bokeh_worker_port)
         sys.exit()
