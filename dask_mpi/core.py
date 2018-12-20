@@ -3,7 +3,7 @@ import sys
 from mpi4py import MPI
 from tornado.ioloop import IOLoop
 
-from dask_mpi.common import (get_host_from_interface,
+from dask_mpi.common import (get_host_from_interface, get_worker_name_from_mpi_rank,
                              start_scheduler, start_scheduler_loop,
                              start_worker, start_worker_loop)
 
@@ -27,7 +27,8 @@ def initialize(scheduler_file='scheduler.json', interface=None, nthreads=1,
         pass
 
     else:
-        worker, addr = start_worker(loop, host=host, name=rank-1, scheduler_file=scheduler_file, nanny=nanny,
+        name = get_worker_name_from_mpi_rank(rank)
+        worker, addr = start_worker(loop, host=host, name=name, scheduler_file=scheduler_file, nanny=nanny,
                                     local_directory=local_directory, nthreads=nthreads, memory_limit=memory_limit,
                                     bokeh=bokeh, bokeh_port=bokeh_worker_port)
         start_worker_loop(worker, addr)

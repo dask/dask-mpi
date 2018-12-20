@@ -26,7 +26,7 @@ def test_basic(loop, nanny):
                     assert time() < start + 10
                     sleep(0.2)
 
-                assert c.submit(lambda x: x + 1, 10, workers=1).result() == 11
+                assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-1').result() == 11
 
 
 def test_no_scheduler(loop):

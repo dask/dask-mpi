@@ -14,6 +14,10 @@ def get_host_from_interface(interface=None):
     return host
 
 
+def get_worker_name_from_mpi_rank(rank):
+    return f'mpi-rank-{rank}'
+
+
 def start_scheduler(loop, host=None, scheduler_file='scheduler.json',
                     bokeh=True, bokeh_port=8787, bokeh_prefix=None):
     try:

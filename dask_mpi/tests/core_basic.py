@@ -18,7 +18,7 @@ with Client(scheduler_file=scheduler_file) as c:
         assert time() < start + 10
         sleep(0.2)
 
-    assert c.submit(lambda x: x + 1, 10, workers=1).result() == 11
+    assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-2').result() == 11
 
     async def stop(dask_scheduler):
         await dask_scheduler.close()
