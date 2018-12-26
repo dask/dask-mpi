@@ -10,5 +10,6 @@ dependencies:
   - mpi4py
   - versioneer
   - pytest
+  - pytest-cov
   - coverage
   - requests
