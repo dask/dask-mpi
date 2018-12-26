@@ -19,12 +19,12 @@ from distributed.utils import tmpfile
 from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
 
-@pytest.mark.skipif(sys.version_info[0] < 3,
-                    reason="Subprocess issues on Python 2")
+FNULL = open(os.devnull, 'w') # hide output of subprocess
+
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny], stdin=subprocess.DEVNULL):
+        with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny], stdin=FNULL):
             with Client(scheduler_file=fn) as c:
                 start = time()
                 n_workers = len(c.scheduler_info()['workers'])
@@ -37,11 +37,9 @@ def test_basic(loop, nanny):
                 assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-1').result() == 11
 
 
-@pytest.mark.skipif(sys.version_info[0] < 3,
-                    reason="Subprocess issues on Python 2")
 def test_no_scheduler(loop):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=subprocess.DEVNULL):
+        with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=FNULL):
             with Client(scheduler_file=fn) as c:
 
                 start = time()
