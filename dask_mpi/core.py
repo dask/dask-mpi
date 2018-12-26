@@ -17,6 +17,35 @@ loop = IOLoop()
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
                bokeh=True, bokeh_port=8787, bokeh_prefix=None, bokeh_worker_port=8789):
+    """
+    Initialize a Dask cluster using mpi4py
+
+    Using mpi4py, MPI rank 0 launches the Scheduler, MPI rank 1 passes through to the
+    client script, and all other MPI ranks launch workers.  All MPI ranks other than
+    MPI rank 1 block while their event loops run and exit once shut down.
+
+    Parameters
+    ----------
+    interface : str
+        Network interface like 'eth0' or 'ib0'
+    nthreads : int
+        Number of threads per worker
+    local_directory : str
+        Directory to place worker files
+    memory_limit : int, float, or 'auto'
+        Number of bytes before spilling data to disk.  This can be an
+        integer (nbytes), float (fraction of total memory), or 'auto'.
+    nanny : bool
+        Start workers in nanny process for management
+    bokeh : bool
+        Enable Bokeh visual diagnostics
+    bokeh_port : int
+        Bokeh port for visual diagnostics
+    bokeh_prefix : str
+        Prefix for the bokeh app
+    bokeh_worker_port : int
+        Worker's Bokeh port for visual diagnostics
+    """
     host = get_host_from_interface(interface)
 
     if rank == 0:

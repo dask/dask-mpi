@@ -1,0 +1,17 @@
+name: dask-mpi-docs
+dependencies:
+  - dask
+  - distributed
+  - mpich
+  - mpi4py
+  - versioneer
+  - pytest
+  - coverage
+  - pytest-cov
+  - requests
+  - sphinx
+  - pygments
+  - pip:
+    - dask_sphinx_theme
+    - numpydoc
+    - sphinx-click

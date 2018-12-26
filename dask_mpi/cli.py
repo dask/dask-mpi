@@ -1,6 +1,5 @@
 from __future__ import print_function, division, absolute_import
 import click
-import dask
 
 from mpi4py import MPI
 from tornado.ioloop import IOLoop
@@ -17,7 +16,7 @@ loop = IOLoop()
 
 @click.command()
 @click.option('--scheduler-file', type=str, default='scheduler.json',
-              help='Filename to JSON encoded scheduler information. ')
+              help='Filename to JSON encoded scheduler information.')
 @click.option('--interface', type=str, default=None,
               help="Network interface like 'eth0' or 'ib0'")
 @click.option('--nthreads', type=int, default=0,

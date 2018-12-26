@@ -26,11 +26,9 @@ def test_basic(loop, nanny):
     with tmpfile(extension='json') as fn:
         with popen(['mpirun', '--np', '4', 'dask-mpi', '--scheduler-file', fn, nanny], stdin=FNULL):
             with Client(scheduler_file=fn) as c:
+
                 start = time()
-                n_workers = len(c.scheduler_info()['workers'])
-                while n_workers != 3:
-                    n_workers = len(c.scheduler_info()['workers'])
-                    print('n_workers = ', n_workers)
+                while len(c.scheduler_info()['workers']) != 3:
                     assert time() < start + 10
                     sleep(0.2)
 
