@@ -6,7 +6,7 @@ from os.path import exists
 from setuptools import setup
 
 
-def environment_dependencies(obj, dependencies: list = None):
+def environment_dependencies(obj, dependencies=None):
     if dependencies is None:
         dependencies = []
     if isinstance(obj, string_types):
