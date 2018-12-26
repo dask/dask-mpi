@@ -1,0 +1,14 @@
+name: dask-mpi-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=2.7
+  - dask
+  - distributed
+  - mpich
+  - mpi4py
+  - versioneer
+  - pytest
+  - coverage
+  - requests
