@@ -1,6 +1,11 @@
 from __future__ import print_function, division, absolute_import
+import os
+import sys
 
-import subprocess
+if os.name == 'posix' and sys.version_info[0] < 3:
+    import subprocess32 as subprocess
+else:
+    import subprocess
 from time import sleep
 
 import pytest
@@ -14,7 +19,8 @@ from distributed.utils import tmpfile
 from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
 
-
+@pytest.mark.skipif(sys.version_info[0] < 3,
+                    reason="Subprocess issues on Python 2")
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
     with tmpfile(extension='json') as fn:
