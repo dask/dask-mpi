@@ -24,7 +24,7 @@ def test_basic(loop, nanny):
                 n_workers = len(c.scheduler_info()['workers'])
                 while n_workers != 3:
                     n_workers = len(c.scheduler_info()['workers'])
-                    print(f'n_workers = {n_workers}')
+                    print('n_workers = ', n_workers)
                     assert time() < start + 10
                     sleep(0.2)
 
