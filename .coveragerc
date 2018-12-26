@@ -1,0 +1,6 @@
+[run]
+omit = 
+    dask_mpi/tests/*.py
+    dask_mpi/_version.py
+    versioneer.py
+    setup.py
