@@ -37,6 +37,8 @@ def test_basic(loop, nanny):
                 assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-1').result() == 11
 
 
+@pytest.mark.skipif(sys.version_info[0] < 3,
+                    reason="Subprocess issues on Python 2")
 def test_no_scheduler(loop):
     with tmpfile(extension='json') as fn:
         with popen(['mpirun', '--np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=subprocess.DEVNULL):
