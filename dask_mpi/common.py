@@ -1,3 +1,4 @@
+from __future__ import print_function, division, absolute_import
 from functools import partial
 
 from distributed import Scheduler, Nanny, Worker
@@ -56,7 +57,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
     W = Nanny if nanny else Worker
     worker = W(scheduler_file=scheduler_file,
                loop=loop,
-               name=f'mpi-rank-{rank}',
+               name='mpi-rank-%d' %rank,
                ncores=nthreads,
                local_dir=local_directory,
                services=services,

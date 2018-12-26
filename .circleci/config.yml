@@ -5,64 +5,64 @@ workflows:
   default:
     jobs:
       - test-2.7
-          filters:
-            branches:
-              only:
-                - master
       - test-3.6
-          filters:
-            branches:
-              only:
-                - master
 
 jobs:
 
   test-2.7:
     docker:
-      - image: frolvlad/alpine-miniconda3
+      - image: continuumio/miniconda:latest
+    environment:
+      PYTHON: "2.7"
+      ENV_NAME: "dask-mpi-dev"
+
     steps:
-      - run: apk add --no-cache build-base ca-certificates git openssh bash curl
       - checkout
       - restore_cache:
-          keys:
-            - conda-pkgs
-      - run: conda create -q -n dask-mpi-dev python=2.7 && conda env update -f environment-dev.yml --prune
-      - run: source activate dask-mpi-dev && pip install --no-deps -e .
-      - save_cache:
-          key: conda-pkgs
-          paths:
-            - /opt/conda/pkgs
+          key: deps-{{ .Branch }}-2.7-{{ checksum "ci/environment-dev-2.7.yml" }}
+      - run:
+          name: Install and activate conda environment
+          command: ./ci/install-circle.sh
       - run:
           name: Running tests
           command: |
-            source activate dask-mpi-dev
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/
-      - run:
-           name: Coverage
-           command: source activate dask-mpi-dev && codecov
-           when: on_success
+      - save_cache:
+          key: deps-{{ .Branch }}-2.7-{{ checksum "ci/environment-dev-2.7.yml" }}
+          paths:
+            - "/opt/conda/envs/${ENV_NAME}/"
+            - "/opt/conda/pkgs"
 
   test-3.6:
     docker:
-      - image: frolvlad/alpine-miniconda3
+      - image: continuumio/miniconda:latest
+
+    environment:
+      PYTHON: "3.6"
+      ENV_NAME: "dask-mpi-dev"
+
     steps:
-      - run: apk add --no-cache build-base ca-certificates git openssh bash curl
       - checkout
       - restore_cache:
-          keys:
-            - conda-pkgs
-      - run: conda create -q -n dask-mpi-dev python=3.6 && conda env update -f environment-dev.yml --prune
-      - run: source activate dask-mpi-dev && pip install --no-deps -e .
-      - save_cache:
-          key: conda-pkgs
-          paths:
-            - /opt/conda/pkgs
+          key: deps-{{ .Branch }}-3.6-{{ checksum "ci/environment-dev-3.6.yml" }}
+      - run:
+          name: Install and activate conda environment
+          command: ./ci/install-circle.sh
       - run:
           name: Running tests
           command: |
-            source activate dask-mpi-dev
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/
+      - save_cache:
+          key: deps-{{ .Branch }}-3.6-{{ checksum "ci/environment-dev-3.6.yml" }}
+          paths:
+            - "/opt/conda/envs/${ENV_NAME}/"
+            - "/opt/conda/pkgs"
       - run:
-           name: Coverage
-           command: source activate dask-mpi-dev && codecov
-           when: on_success
+          name: Code Coverage
+          command: |
+            source activate ${ENV_NAME}
+
+            echo "[Uploading Coverage]"
+            codecov
