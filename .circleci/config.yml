@@ -5,15 +5,7 @@ workflows:
   default:
     jobs:
       - test-2.7
-          filters:
-            branches:
-              only:
-                - master
       - test-3.6
-          filters:
-            branches:
-              only:
-                - master
 
 jobs:
 
