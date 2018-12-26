@@ -4,11 +4,11 @@ Dask-MPI
 *Easily deploy Dask using MPI*
 
 
-The Dask-mpi project makes it easy to deploy Dask from within an existing MPI
+The Dask-MPI project makes it easy to deploy Dask from within an existing MPI
 environment, such as one created with the common MPI command-line launchers
 ``mpirun`` or ``mpiexec``.  Such environments are commonly found in high performance
 supercomputers, academic research institutions, and other clusters where MPI
-has already been installed.  Dask-mpi provides a convenient interface for
+has already been installed.  Dask-MPI provides a convenient interface for
 launching your cluster either from within a batch script or directly from the
 command-line.
 
@@ -20,7 +20,7 @@ command and specifying a scheduler JSON file.
 
 .. code-block:: bash
 
-   mpirun --np 4 dask-mpi --scheduler-file /path/to/scheduler.json
+   mpirun -np 4 dask-mpi --scheduler-file /path/to/scheduler.json
 
 You can then access this cluster from a batch script or an interactive session
 (such as a Jupyter Notebook) by referencing the scheduler file.
@@ -49,8 +49,7 @@ which makes your Python script launchable directly with ``mpirun`` or ``mpiexec`
 
 .. code-block:: bash
 
-   mpirun --np 4 python my_client_script.py
-
+   mpirun -np 4 python my_client_script.py
 
 .. toctree::
    :maxdepth: 1
@@ -60,17 +59,17 @@ which makes your Python script launchable directly with ``mpirun`` or ``mpiexec`
    interactive
    batch
 
-
 .. toctree::
    :maxdepth: 1
    :caption: Detailed use
 
+   cli
    api
 
 .. toctree::
    :maxdepth: 1
    :caption: Help & Reference
 
-   changelog
+   howitworks
    develop
    history

@@ -1,12 +1,12 @@
 Installing
 ==========
 
-You can install dask-mpi with ``pip``, ``conda``, or by installing from source.
+You can install Dask-MPI with ``pip``, ``conda``, or by installing from source.
 
 Pip
 ---
 
-Pip can be used to install both dask-mpi and its dependencies (e.g. dask,
+Pip can be used to install both Dask-MPI and its dependencies (e.g. dask,
 distributed,  NumPy, Pandas, etc.) that are necessary for different
 workloads.::
 
@@ -15,7 +15,7 @@ workloads.::
 Conda
 -----
 
-To install the latest version of dask-mpi from the
+To install the latest version of Dask-MPI from the
 `conda-forge <https://conda-forge.github.io/>`_ repository using
 `conda <https://www.anaconda.com/downloads>`_::
 
@@ -24,7 +24,7 @@ To install the latest version of dask-mpi from the
 Install from Source
 -------------------
 
-To install dask-mpi from source, clone the repository from `github
+To install Dask-MPI from source, clone the repository from `github
 <https://github.com/dask/dask-mpi>`_::
 
     git clone https://github.com/dask/dask-mpi.git
@@ -43,7 +43,7 @@ You can also install directly from git master branch::
 Test
 ----
 
-Test dask-mpi with ``pytest``::
+Test Dask-MPI with ``pytest``::
 
     git clone https://github.com/dask/dask-mpi.git
     cd dask-mpi

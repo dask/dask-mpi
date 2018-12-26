@@ -1,12 +1,11 @@
+.. currentmodule:: dask_mpi.core
+
 .. _api:
 
-.. currentmodule:: dask_mpi
-
-
-API
-===
+Application Program Interface (API)
+===================================
 
 .. autosummary::
    :toctree: generated/
 
-
+   initialize
