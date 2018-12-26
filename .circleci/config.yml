@@ -59,3 +59,10 @@ jobs:
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
+      - run:
+          name: Code Coverage
+          command: |
+            source activate ${ENV_NAME}
+
+            echo "[Uploading Coverage]"
+            codecov
