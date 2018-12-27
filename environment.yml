@@ -3,3 +3,5 @@ dependencies:
   - dask
   - distributed
   - mpi4py
+  - pip:
+    - git+git://github.com/dask/distributed.git
