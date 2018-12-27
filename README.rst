@@ -26,6 +26,6 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/dask/dask-mpi.svg?style=for-the-badge
     :target: https://codecov.io/gh/dask/dask-mpi
 
-.. |Docs| image:: https://readthedocs.org/projects/dask-mpi/badge/?version=latest
+.. |Docs| image:: https://readthedocs.org/projects/dask-mpi/badge/?version=latest?style=for-the-badge
     :target: https://dask-mpi.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
