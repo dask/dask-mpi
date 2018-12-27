@@ -5,6 +5,7 @@ import sys
 import subprocess
 
 import pytest
+
 pytest.importorskip('mpi4py')
 
 
