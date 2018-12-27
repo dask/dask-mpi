@@ -2,7 +2,7 @@
 Deploying Dask using MPI4Py
 ===========================
 
-|Gitter| |Circle| |Codecov|
+|Gitter| |Circle| |Codecov| |Docs|
 
 Easily deploy Dask Distributed in an existing MPI environment, such as one
 created with the ``mpirun`` or ``mpiexec`` MPI launch commands.  See documentation_
