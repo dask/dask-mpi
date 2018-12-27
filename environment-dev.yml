@@ -9,5 +9,3 @@ dependencies:
   - pytest-cov
   - coverage
   - requests
-  - pip:
-    - git+https://github.com/dask/distributed.git

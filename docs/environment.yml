@@ -8,7 +8,6 @@ dependencies:
   - sphinx
   - pygments
   - pip:
-    - git+https://github.com/dask/distributed.git
     - dask_sphinx_theme
     - numpydoc
     - sphinx-click
