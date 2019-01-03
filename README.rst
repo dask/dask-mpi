@@ -2,7 +2,7 @@
 Deploying Dask using MPI4Py
 ===========================
 
-|Gitter| |Circle| |Codecov| |Docs|
+|Gitter| |Circle| |Codecov| |Docs| |PyPI|
 
 Easily deploy Dask Distributed in an existing MPI environment, such as one
 created with the ``mpirun`` or ``mpiexec`` MPI launch commands.  See documentation_
@@ -20,7 +20,7 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
    :alt: Join the chat at https://gitter.im/dask/dask
    :target: https://gitter.im/dask/dask?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-.. |Circle| image:: https://img.shields.io/circleci/project/github/dask/dask-mpi/master.svg?style=for-the-badge
+.. |Circle| image:: https://img.shields.io/circleci/project/github/dask/dask-mpi/master.svg?style=for-the-badge&logo=circleci
     :target: https://circleci.com/gh/dask/dask-mpi/tree/master
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/dask/dask-mpi.svg?style=for-the-badge
@@ -29,3 +29,7 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
 .. |Docs| image:: https://readthedocs.org/projects/dask-mpi/badge/?version=latest&style=for-the-badge
     :target: https://dask-mpi.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/dask-mpi.svg?style=for-the-badge
+    :target: https://pypi.org/project/dask-mpi/
+    :alt: Python Package Index
