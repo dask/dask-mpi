@@ -1,2 +1,8 @@
+recursive-include dask_mpi *.py
+
+include setup.py
+include LICENSE.txt
+include README.rst
+include MANIFEST.in
+include environment.yml
 include versioneer.py
-include dask_mpi/_version.py
