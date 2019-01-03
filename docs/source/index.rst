@@ -58,6 +58,15 @@ file that ``dask-mpi`` created.
    client = Client(scheduler_file='~/dask-scheduler.json')
 
 
+Use Job Queuing System Directly
+-------------------------------
+
+You can also use `Dask Jobqueue <https://jobqueue.dask.org>`_ to deploy Dask
+directly on a job queuing system like SLURM, SGE, PBS, LSF, Torque, or others.
+This can be especially nice when you want to dynamically scale your cluster
+during your computation, or for interactive use.
+
+
 .. toctree::
    :maxdepth: 1
    :hidden:
