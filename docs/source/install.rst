@@ -29,11 +29,7 @@ To install Dask-MPI from source, clone the repository from `github
 
     git clone https://github.com/dask/dask-mpi.git
     cd dask-mpi
-    python setup.py install
-
-or use ``pip`` locally if you want to install all dependencies as well::
-
-    pip install -e .
+    pip install .
 
 You can also install directly from git master branch::
 
