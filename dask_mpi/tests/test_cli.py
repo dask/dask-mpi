@@ -18,7 +18,7 @@ from distributed.utils_test import loop  # noqa: F401
 
 FNULL = open(os.devnull, 'w')  # hide output of subprocess
 
-
+@pytest.mark.skip
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
     with tmpfile(extension='json') as fn:
@@ -32,7 +32,7 @@ def test_basic(loop, nanny):
 
                 assert c.submit(lambda x: x + 1, 10, workers='mpi-rank-1').result() == 11
 
-
+@pytest.mark.skip
 def test_no_scheduler(loop):
     with tmpfile(extension='json') as fn:
         with popen(['mpirun', '-np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=FNULL):
