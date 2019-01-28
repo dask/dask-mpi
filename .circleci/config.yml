@@ -13,8 +13,8 @@ jobs:
 
   test-2.7-mpich:
     docker:
-      - image: condaforge/linux-anvil:latest
-       
+      - image: continuumio/miniconda:latest
+
     environment:
       PYTHON: "2.7"
       ENV_NAME: "dask-mpi-dev"
@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Running tests
           command: |
-            conda activate ${ENV_NAME}
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
           key: deps-{{ .Branch }}-2.7-mpich-{{ checksum "ci/environment-dev-2.7-mpich.yml" }}
@@ -40,7 +40,8 @@ jobs:
 
   test-2.7-openmpi:
     docker:
-      - image: condaforge/linux-anvil:latest
+      - image: continuumio/miniconda:latest
+  
 
     environment:
       PYTHON: "2.7"
@@ -57,7 +58,7 @@ jobs:
       - run:
           name: Running tests
           command: |
-            conda activate ${ENV_NAME}
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
           key: deps-{{ .Branch }}-2.7-openmpi-{{ checksum "ci/environment-dev-2.7-openmpi.yml" }}
@@ -67,7 +68,7 @@ jobs:
 
   test-3.6-mpich:
     docker:
-      - image: condaforge/linux-anvil:latest
+      - image: continuumio/miniconda:latest
 
     environment:
       PYTHON: "3.6"
@@ -84,7 +85,7 @@ jobs:
       - run:
           name: Running tests
           command: |
-            conda activate ${ENV_NAME}
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
           key: deps-{{ .Branch }}-3.6-mpich-{{ checksum "ci/environment-dev-3.6-mpich.yml" }}
@@ -94,15 +95,14 @@ jobs:
       - run:
           name: Code Coverage
           command: |
-            conda activate ${ENV_NAME}
+            source activate ${ENV_NAME}
 
             echo "[Uploading Coverage]"
             codecov
 
   test-3.6-openmpi:
     docker:
-      - image: condaforge/linux-anvil:latest
-    user: openmpi
+      - image: continuumio/miniconda:latest
 
     environment:
       PYTHON: "3.6"
@@ -119,7 +119,7 @@ jobs:
       - run:
           name: Running tests
           command: |
-            conda activate ${ENV_NAME}
+            source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
           key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum "ci/environment-dev-3.6-openmpi.yml" }}
