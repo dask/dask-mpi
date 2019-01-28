@@ -5,6 +5,7 @@ channels:
 dependencies:
   - python=2.7
   - dask
+  - distributed
   - mpich
   - mpi4py
   - pytest
@@ -13,7 +14,5 @@ dependencies:
   - requests
   - codecov
   - subprocess32
-  - pip:
-      - git+git://github.com/dask/distributed.git
 
 
