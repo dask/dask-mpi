@@ -22,7 +22,7 @@ FNULL = open(os.devnull, 'w')  # hide output of subprocess
 @pytest.mark.parametrize('nanny', ['--nanny', '--no-nanny'])
 def test_basic(loop, nanny):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '-np', '4', '--oversubscribe', 'dask-mpi', '--scheduler-file', fn, nanny]):
+        with popen(['mpirun', '-np', '4', 'dask-mpi', '--scheduler-file', fn, nanny]):
             with Client(scheduler_file=fn) as c:
 
                 start = time()
@@ -35,7 +35,7 @@ def test_basic(loop, nanny):
 
 def test_no_scheduler(loop):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '-np', '2', '--oversubscribe', 'dask-mpi', '--scheduler-file', fn], stdin=FNULL):
+        with popen(['mpirun', '-np', '2', 'dask-mpi', '--scheduler-file', fn], stdin=FNULL):
             with Client(scheduler_file=fn) as c:
 
                 start = time()
@@ -45,7 +45,7 @@ def test_no_scheduler(loop):
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
-                with popen(['mpirun', '-np', '1', '--oversubscribe', 'dask-mpi', '--scheduler-file', fn, '--no-scheduler']):
+                with popen(['mpirun', '-np', '1', 'dask-mpi', '--scheduler-file', fn, '--no-scheduler']):
 
                     start = time()
                     while len(c.scheduler_info()['workers']) != 2:
@@ -67,7 +67,7 @@ def check_port_okay(port):
 
 def test_bokeh_scheduler(loop):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '-np', '2', '--oversubscribe', 'dask-mpi', '--scheduler-file', fn, '--bokeh-port', '59583'],
+        with popen(['mpirun', '-np', '2', 'dask-mpi', '--scheduler-file', fn, '--bokeh-port', '59583'],
                    stdin=FNULL):
             check_port_okay(59583)
 
@@ -78,6 +78,6 @@ def test_bokeh_scheduler(loop):
 @pytest.mark.skip
 def test_bokeh_worker(loop):
     with tmpfile(extension='json') as fn:
-        with popen(['mpirun', '-np', '2', '--oversubscribe', 'dask-mpi', '--scheduler-file', fn, '--bokeh-worker-port', '59584'],
+        with popen(['mpirun', '-np', '2', 'dask-mpi', '--scheduler-file', fn, '--bokeh-worker-port', '59584'],
                    stdin=FNULL):
             check_port_okay(59584)
