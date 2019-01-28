@@ -41,6 +41,7 @@ jobs:
   test-2.7-openmpi:
     docker:
       - image: continuumio/miniconda:latest
+    user: openmpi
 
     environment:
       PYTHON: "2.7"
@@ -102,6 +103,7 @@ jobs:
   test-3.6-openmpi:
     docker:
       - image: continuumio/miniconda:latest
+    user: openmpi
 
     environment:
       PYTHON: "3.6"
