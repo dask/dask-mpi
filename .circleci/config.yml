@@ -13,8 +13,8 @@ jobs:
 
   test-2.7-mpich:
     docker:
-      - image: continuumio/miniconda:latest
-
+      - image: condaforge/linux-anvil:latest
+       
     environment:
       PYTHON: "2.7"
       ENV_NAME: "dask-mpi-dev"
@@ -40,8 +40,7 @@ jobs:
 
   test-2.7-openmpi:
     docker:
-      - image: continuumio/miniconda:latest
-    user: openmpi
+      - image: condaforge/linux-anvil:latest
 
     environment:
       PYTHON: "2.7"
@@ -68,7 +67,7 @@ jobs:
 
   test-3.6-mpich:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: condaforge/linux-anvil:latest
 
     environment:
       PYTHON: "3.6"
@@ -102,7 +101,7 @@ jobs:
 
   test-3.6-openmpi:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: condaforge/linux-anvil:latest
     user: openmpi
 
     environment:
