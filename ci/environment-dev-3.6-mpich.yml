@@ -1,0 +1,18 @@
+name: dask-mpi-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.6
+  - dask
+  - mpich
+  - mpi4py
+  - pytest
+  - pytest-icdiff
+  - pytest-cov
+  - coverage
+  - requests
+  - codecov
+  - pip:
+      - git+git://github.com/dask/distributed.git
+

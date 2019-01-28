@@ -7,7 +7,6 @@ dependencies:
   - dask
   - mpich
   - mpi4py
-  - versioneer
   - pytest
   - pytest-cov
   - coverage

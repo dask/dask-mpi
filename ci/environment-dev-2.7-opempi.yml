@@ -3,16 +3,17 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.6
+  - python=2.7
   - dask
-  - mpich
+  - openmpi
   - mpi4py
-  - versioneer
   - pytest
   - pytest-cov
   - coverage
   - requests
   - codecov
+  - subprocess32
   - pip:
       - git+git://github.com/dask/distributed.git
+
 
