@@ -16,18 +16,14 @@ from distributed.utils import tmpfile
 from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
 
-try:
-    ALLOW_RUN_AS_ROOT = bool(os.environ.get("ALLOW_RUN_AS_ROOT"))
-except:
-    ALLOW_RUN_AS_ROOT = False
 
 FNULL = open(os.devnull, "w")  # hide output of subprocess
 
 
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
-def test_basic(loop, nanny):
+def test_basic(loop, nanny, allow_run_as_root):
     with tmpfile(extension="json") as fn:
-        if ALLOW_RUN_AS_ROOT:
+        if allow_run_as_root:
             cmd = [
                 "mpirun",
                 "-np",
@@ -54,9 +50,9 @@ def test_basic(loop, nanny):
                 )
 
 
-def test_no_scheduler(loop):
+def test_no_scheduler(loop, allow_run_as_root):
     with tmpfile(extension="json") as fn:
-        if ALLOW_RUN_AS_ROOT:
+        if allow_run_as_root:
             cmd = [
                 "mpirun",
                 "-np",
@@ -79,7 +75,7 @@ def test_no_scheduler(loop):
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
-                if ALLOW_RUN_AS_ROOT:
+                if allow_run_as_root:
                     cmd = [
                         "mpirun",
                         "-np",
@@ -121,10 +117,10 @@ def check_port_okay(port):
             assert time() < start + 20
 
 
-def test_bokeh_scheduler(loop):
+def test_bokeh_scheduler(loop, allow_run_as_root):
     with tmpfile(extension="json") as fn:
 
-        if ALLOW_RUN_AS_ROOT:
+        if allow_run_as_root:
             cmd = [
                 "mpirun",
                 "-np",

@@ -8,18 +8,13 @@ import pytest
 
 pytest.importorskip("mpi4py")
 
-try:
-    ALLOW_RUN_AS_ROOT = bool(os.environ.get("ALLOW_RUN_AS_ROOT"))
-except:
-    ALLOW_RUN_AS_ROOT = False
 
-
-def test_basic():
+def test_basic(allow_run_as_root):
     script_file = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), "core_basic.py"
     )
 
-    if ALLOW_RUN_AS_ROOT:
+    if allow_run_as_root:
         p = subprocess.Popen(
             ["mpirun", "-np", "4", "--allow-run-as-root", sys.executable, script_file]
         )
