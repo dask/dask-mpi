@@ -5,9 +5,7 @@ from mpi4py import MPI
 from tornado.ioloop import IOLoop
 from distributed.cli.utils import check_python_3
 
-from dask_mpi.common import (get_host_from_interface,
-                             create_scheduler, run_scheduler,
-                             create_and_run_worker)
+from dask_mpi.common import get_host_from_interface, create_scheduler, run_scheduler, create_and_run_worker
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
