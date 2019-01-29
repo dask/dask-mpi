@@ -63,7 +63,7 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
         run_scheduler(scheduler)
         sys.exit()
     elif rank == 1:
-        return
+        atexit.register(send_close_signal)
     else:
         create_and_run_worker(loop, host=host, rank=rank, nanny=nanny, nthreads=nthreads,
                               local_directory=local_directory, memory_limit=memory_limit,
@@ -81,7 +81,3 @@ def send_close_signal():
 
     with Client() as c:
         c.run_on_scheduler(stop, wait=False)
-
-
-if rank == 1:
-    atexit.register(send_close_signal)
