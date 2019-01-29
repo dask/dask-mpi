@@ -14,7 +14,7 @@ except:
     ALLOW_RUN_AS_ROOT = False
 
 
-def test_basic(ALLOW_RUN_AS_ROOT):
+def test_basic():
     script_file = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), "core_basic.py"
     )
