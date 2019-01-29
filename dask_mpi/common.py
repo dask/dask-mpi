@@ -33,11 +33,11 @@ def create_scheduler(loop, scheduler_file=None, host=None, bokeh=True, bokeh_por
 
 
 def run_scheduler(scheduler):
-    loop = scheduler.loop
+    scheduler_loop = scheduler.loop
     try:
-        loop.start()
+        scheduler_loop.start()
     finally:
-        loop.close()
+        scheduler_loop.close()
     scheduler.stop()
 
 
@@ -70,13 +70,13 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
         while worker.status != 'closed':
             yield gen.sleep(0.2)
 
-    loop = worker.loop
+    worker_loop = worker.loop
     try:
-        loop.run_sync(run_until_closed)
+        worker_loop.run_sync(run_until_closed)
     finally:
         @gen.coroutine
         def close():
             yield worker._close(timeout=2)
 
-        loop.run_sync(close)
-        loop.close()
+        worker_loop.run_sync(close)
+        worker_loop.close()

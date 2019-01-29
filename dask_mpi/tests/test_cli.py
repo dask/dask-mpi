@@ -34,13 +34,12 @@ def test_basic(loop, nanny, mpirun):
                     assert time() < start + 10
                     sleep(0.2)
 
-                assert (
-                    c.submit(lambda x: x + 1, 10, workers="mpi-rank-1").result() == 11
-                )
+                assert c.submit(lambda x: x + 1, 10, workers="mpi-rank-1").result() == 11
 
 
 def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
+
         cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
 
         with popen(cmd, stdin=FNULL):
@@ -53,14 +52,7 @@ def test_no_scheduler(loop, mpirun):
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
-                cmd = mpirun + [
-                    "-np",
-                    "1",
-                    "dask-mpi",
-                    "--scheduler-file",
-                    fn,
-                    "--no-scheduler",
-                ]
+                cmd = mpirun + ["-np", "1", "dask-mpi", "--scheduler-file", fn, "--no-scheduler"]
 
                 with popen(cmd):
                     start = time()
@@ -84,15 +76,7 @@ def check_port_okay(port):
 def test_bokeh_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + [
-            "-np",
-            "2",
-            "dask-mpi",
-            "--scheduler-file",
-            fn,
-            "--bokeh-port",
-            "59583",
-        ]
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, "--bokeh-port", "59583"]
 
         with popen(cmd, stdin=FNULL):
             check_port_okay(59583)
@@ -104,14 +88,8 @@ def test_bokeh_scheduler(loop, mpirun):
 @pytest.mark.skip
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
-        cmd = mpirun + [
-            "-np",
-            "2",
-            "dask-mpi",
-            "--scheduler-file",
-            fn,
-            "--bokeh-worker-port",
-            "59584",
-        ]
+
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, "--bokeh-worker-port", "59584"]
+
         with popen(cmd, stdin=FNULL):
             check_port_okay(59584)
