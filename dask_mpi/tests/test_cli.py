@@ -21,21 +21,10 @@ FNULL = open(os.devnull, "w")  # hide output of subprocess
 
 
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
-def test_basic(loop, nanny, allow_run_as_root):
+def test_basic(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
-        if allow_run_as_root:
-            cmd = [
-                "mpirun",
-                "-np",
-                "4",
-                "--allow-run-as-root",
-                "dask-mpi",
-                "--scheduler-file",
-                fn,
-                nanny,
-            ]
-        else:
-            cmd = ["mpirun", "-np", "4", "dask-mpi", "--scheduler-file", fn, nanny]
+
+        cmd = mpirun + ["-np", "4", "dask-mpi", "--scheduler-file", fn, nanny]
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
@@ -50,20 +39,9 @@ def test_basic(loop, nanny, allow_run_as_root):
                 )
 
 
-def test_no_scheduler(loop, allow_run_as_root):
+def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
-        if allow_run_as_root:
-            cmd = [
-                "mpirun",
-                "-np",
-                "2",
-                "--allow-run-as-root",
-                "dask-mpi",
-                "--scheduler-file",
-                fn,
-            ]
-        else:
-            cmd = ["mpirun", "-np", "2", "dask-mpi", "--scheduler-file", fn]
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
 
         with popen(cmd, stdin=FNULL):
             with Client(scheduler_file=fn) as c:
@@ -75,28 +53,14 @@ def test_no_scheduler(loop, allow_run_as_root):
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
-                if allow_run_as_root:
-                    cmd = [
-                        "mpirun",
-                        "-np",
-                        "1",
-                        "--allow-run-as-root",
-                        "dask-mpi",
-                        "--scheduler-file",
-                        fn,
-                        "--no-scheduler",
-                    ]
-
-                else:
-                    cmd = [
-                        "mpirun",
-                        "-np",
-                        "1",
-                        "dask-mpi",
-                        "--scheduler-file",
-                        fn,
-                        "--no-scheduler",
-                    ]
+                cmd = mpirun + [
+                    "-np",
+                    "1",
+                    "dask-mpi",
+                    "--scheduler-file",
+                    fn,
+                    "--no-scheduler",
+                ]
 
                 with popen(cmd):
                     start = time()
@@ -117,33 +81,18 @@ def check_port_okay(port):
             assert time() < start + 20
 
 
-def test_bokeh_scheduler(loop, allow_run_as_root):
+def test_bokeh_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        if allow_run_as_root:
-            cmd = [
-                "mpirun",
-                "-np",
-                "2",
-                "--allow-run-as-root",
-                "dask-mpi",
-                "--scheduler-file",
-                fn,
-                "--bokeh-port",
-                "59583",
-            ]
-
-        else:
-            cmd = [
-                "mpirun",
-                "-np",
-                "2",
-                "dask-mpi",
-                "--scheduler-file",
-                fn,
-                "--bokeh-port",
-                "59583",
-            ]
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--bokeh-port",
+            "59583",
+        ]
 
         with popen(cmd, stdin=FNULL):
             check_port_okay(59583)
@@ -153,19 +102,16 @@ def test_bokeh_scheduler(loop, allow_run_as_root):
 
 
 @pytest.mark.skip
-def test_bokeh_worker(loop):
+def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
-        with popen(
-            [
-                "mpirun",
-                "-np",
-                "2",
-                "dask-mpi",
-                "--scheduler-file",
-                fn,
-                "--bokeh-worker-port",
-                "59584",
-            ],
-            stdin=FNULL,
-        ):
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--bokeh-worker-port",
+            "59584",
+        ]
+        with popen(cmd, stdin=FNULL):
             check_port_okay(59584)
