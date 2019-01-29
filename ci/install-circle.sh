@@ -3,7 +3,7 @@
 set -e
 set -eo pipefail
 
-
+echo $ALLOW_RUN_AS_ROOT
 conda config --set always_yes true --set changeps1 false --set quiet true
 conda update -q conda
 conda config --set pip_interop_enabled True # Enable pip interoperability
