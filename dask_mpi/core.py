@@ -12,7 +12,6 @@ from dask_mpi.common import get_host_from_interface, create_scheduler, run_sched
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-loop = IOLoop()
 
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
@@ -47,6 +46,8 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
         Worker's Bokeh port for visual diagnostics
     """
     host = get_host_from_interface(interface)
+
+    loop = IOLoop()
 
     if rank == 0:
         scheduler = create_scheduler(loop, host=host, bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)

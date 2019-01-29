@@ -9,7 +9,6 @@ from dask_mpi.common import get_host_from_interface, create_scheduler, run_sched
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-loop = IOLoop()
 
 
 @click.command()
@@ -42,6 +41,8 @@ loop = IOLoop()
 def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
          scheduler, bokeh, bokeh_port, bokeh_prefix, nanny, bokeh_worker_port):
     host = get_host_from_interface(interface)
+
+    loop = IOLoop()
 
     if rank == 0 and scheduler:
         scheduler_obj = create_scheduler(loop, host=host, scheduler_file=scheduler_file,
