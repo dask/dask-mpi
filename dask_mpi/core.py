@@ -8,7 +8,10 @@ from mpi4py import MPI
 from tornado import gen
 from tornado.ioloop import IOLoop
 
-from dask_mpi.common import get_host_from_interface, create_scheduler, run_scheduler, create_and_run_worker
+from .common import get_host_from_interface, create_scheduler, run_scheduler, create_and_run_worker
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
 
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
@@ -44,8 +47,6 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     """
     host = get_host_from_interface(interface)
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
     loop = IOLoop()
 
     if rank == 0:
