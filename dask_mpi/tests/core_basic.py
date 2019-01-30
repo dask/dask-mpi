@@ -2,7 +2,7 @@ from time import sleep
 from distributed import Client
 from distributed.metrics import time
 
-from dask_mpi.core import initialize
+from dask_mpi import initialize
 
 initialize()
 
