@@ -1,17 +1,14 @@
 from __future__ import print_function, division, absolute_import
-import sys
-import dask
-import atexit
 
+import atexit
+import sys
+
+import dask
 from distributed import Client
-from mpi4py import MPI
 from tornado import gen
 from tornado.ioloop import IOLoop
 
 from .common import get_host_from_interface, create_scheduler, run_scheduler, create_and_run_worker
-
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
 
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
@@ -47,6 +44,9 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     """
     host = get_host_from_interface(interface)
 
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
     loop = IOLoop()
 
     if rank == 0:
