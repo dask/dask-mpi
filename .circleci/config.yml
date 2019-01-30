@@ -23,17 +23,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-2.7-mpich-{{ checksum "ci/environment-dev-2.7-mpich.yml" }}
+          key: deps-{{ .Branch }}-2.7-mpich-{{ checksum ".circleci/env-2.7-mpich.yml" }}
       - run:
           name: Install and activate conda environment
-          command: ./ci/install-circle.sh
+          command: .circleci/install.sh
       - run:
           name: Running tests
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
-          key: deps-{{ .Branch }}-2.7-mpich-{{ checksum "ci/environment-dev-2.7-mpich.yml" }}
+          key: deps-{{ .Branch }}-2.7-mpich-{{ checksum ".circleci/env-2.7-mpich.yml" }}
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
@@ -53,17 +53,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-2.7-openmpi-{{ checksum "ci/environment-dev-2.7-openmpi.yml" }}
+          key: deps-{{ .Branch }}-2.7-openmpi-{{ checksum ".circleci/env-2.7-openmpi.yml" }}
       - run:
           name: Install and activate conda environment
-          command: ./ci/install-circle.sh
+          command: .circleci/install.sh
       - run:
           name: Running tests
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
-          key: deps-{{ .Branch }}-2.7-openmpi-{{ checksum "ci/environment-dev-2.7-openmpi.yml" }}
+          key: deps-{{ .Branch }}-2.7-openmpi-{{ checksum ".circleci/env-2.7-openmpi.yml" }}
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
@@ -80,17 +80,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-3.6-mpich-{{ checksum "ci/environment-dev-3.6-mpich.yml" }}
+          key: deps-{{ .Branch }}-3.6-mpich-{{ checksum ".circleci/env-3.6-mpich.yml" }}
       - run:
           name: Install and activate conda environment
-          command: ./ci/install-circle.sh
+          command: .circleci/install.sh
       - run:
           name: Running tests
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
-          key: deps-{{ .Branch }}-3.6-mpich-{{ checksum "ci/environment-dev-3.6-mpich.yml" }}
+          key: deps-{{ .Branch }}-3.6-mpich-{{ checksum ".circleci/env-3.6-mpich.yml" }}
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
@@ -116,17 +116,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum "ci/environment-dev-3.6-openmpi.yml" }}
+          key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum ".circleci/env-3.6-openmpi.yml" }}
       - run:
           name: Install and activate conda environment
-          command: ./ci/install-circle.sh
+          command: .circleci/install.sh
       - run:
           name: Running tests
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
       - save_cache:
-          key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum "ci/environment-dev-3.6-openmpi.yml" }}
+          key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum ".circleci/env-3.6-openmpi.yml" }}
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
