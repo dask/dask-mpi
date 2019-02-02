@@ -14,7 +14,7 @@ LICENSE
 
 BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LICENSE.txt>`__)
 
-.. _documentation: http://dask-mpi.readthedocs.io
+.. _documentation: http://mpi.dask.org
 
 .. |Gitter| image:: https://img.shields.io/gitter/room/dask/dask.svg?style=for-the-badge
    :alt: Join the chat at https://gitter.im/dask/dask
@@ -27,7 +27,7 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
     :target: https://codecov.io/gh/dask/dask-mpi
 
 .. |Docs| image:: https://readthedocs.org/projects/dask-mpi/badge/?version=latest&style=for-the-badge
-    :target: https://dask-mpi.readthedocs.io/en/latest/?badge=latest
+    :target: https://mpi.dask.org/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/dask-mpi.svg?style=for-the-badge
