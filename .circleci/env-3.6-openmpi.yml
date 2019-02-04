@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=3.6
   - dask
-  - distributed
+  - distributed=1.25.2
   - openmpi
   - mpi4py
   - pytest
