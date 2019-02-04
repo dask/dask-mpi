@@ -1,7 +1,7 @@
 name: dask-mpi-dev
 dependencies:
   - dask
-  - distributed
+  - distributed=1.25.2
   - mpich
   - mpi4py
   - versioneer

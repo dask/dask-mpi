@@ -10,7 +10,7 @@ def environment_dependencies(obj, dependencies=None):
     if dependencies is None:
         dependencies = []
     if isinstance(obj, string_types):
-        dependencies.append(obj)
+        dependencies.append(obj.replace('=', '=='))
     elif isinstance(obj, dict):
         if 'dependencies' in obj:
             environment_dependencies(obj['dependencies'], dependencies=dependencies)
