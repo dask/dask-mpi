@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=2.7
   - dask
-  - distributed
+  - distributed=1.25.2
   - mpich
   - mpi4py
   - pytest
