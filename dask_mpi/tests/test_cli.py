@@ -61,6 +61,26 @@ def test_no_scheduler(loop, mpirun):
                         sleep(0.2)
 
 
+@pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
+def test_non_default_ports(loop, nanny, mpirun):
+    with tmpfile(extension="json") as fn:
+
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, nanny,
+                        "--scheduler-port", "56723",
+                        "--worker-port", "58464",
+                        "--nanny-port", "50164"]
+
+        with popen(cmd):
+            with Client(scheduler_file=fn) as c:
+
+                start = time()
+                while len(c.scheduler_info()["workers"]) != 3:
+                    assert time() < start + 10
+                    sleep(0.2)
+
+                assert c.submit(lambda x: x + 1, 10, workers="mpi-rank-1").result() == 11
+
+
 def check_port_okay(port):
     start = time()
     while True:
