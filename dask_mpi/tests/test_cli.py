@@ -74,7 +74,7 @@ def test_non_default_ports(loop, nanny, mpirun):
             with Client(scheduler_file=fn) as c:
 
                 start = time()
-                while len(c.scheduler_info()["workers"]) != 3:
+                while len(c.scheduler_info()["workers"]) != 1:
                     assert time() < start + 10
                     sleep(0.2)
 
