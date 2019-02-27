@@ -11,6 +11,7 @@ pytest.importorskip("mpi4py")
 import requests
 
 from distributed import Client
+from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
 from distributed.utils import tmpfile
 from distributed.utils_test import popen
@@ -78,7 +79,19 @@ def test_non_default_ports(loop, nanny, mpirun):
                     assert time() < start + 10
                     sleep(0.2)
 
-                assert c.submit(lambda x: x + 1, 10, workers="mpi-rank-1").result() == 11
+                sched_info = c.scheduler_info()
+                sched_host, sched_port = get_address_host_port(
+                    sched_info['address'])
+                assert sched_port == 56723
+                for worker_addr, worker_info in sched_info['workers'].items():
+                    worker_host, worker_port = get_address_host_port(
+                        worker_addr)
+                    assert worker_port == 58464
+                    if nanny:
+                        nanny_port = worker_info['services']['nanny']
+                        assert nanny_port == 50164
+
+                assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
 def check_port_okay(port):
