@@ -87,7 +87,7 @@ def test_non_default_ports(loop, nanny, mpirun):
                     worker_host, worker_port = get_address_host_port(
                         worker_addr)
                     assert worker_port == 58464
-                    if nanny:
+                    if nanny == "--nanny":
                         nanny_port = worker_info['services']['nanny']
                         assert nanny_port == 50164
 
