@@ -11,6 +11,7 @@ pytest.importorskip("mpi4py")
 import requests
 
 from distributed import Client
+from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
 from distributed.utils import tmpfile
 from distributed.utils_test import popen
@@ -59,6 +60,38 @@ def test_no_scheduler(loop, mpirun):
                     while len(c.scheduler_info()["workers"]) != 2:
                         assert time() < start + 10
                         sleep(0.2)
+
+
+@pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
+def test_non_default_ports(loop, nanny, mpirun):
+    with tmpfile(extension="json") as fn:
+
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, nanny,
+                        "--scheduler-port", "56723",
+                        "--worker-port", "58464",
+                        "--nanny-port", "50164"]
+
+        with popen(cmd):
+            with Client(scheduler_file=fn) as c:
+
+                start = time()
+                while len(c.scheduler_info()["workers"]) != 1:
+                    assert time() < start + 10
+                    sleep(0.2)
+
+                sched_info = c.scheduler_info()
+                sched_host, sched_port = get_address_host_port(
+                    sched_info['address'])
+                assert sched_port == 56723
+                for worker_addr, worker_info in sched_info['workers'].items():
+                    worker_host, worker_port = get_address_host_port(
+                        worker_addr)
+                    assert worker_port == 58464
+                    if nanny == "--nanny":
+                        nanny_port = worker_info['services']['nanny']
+                        assert nanny_port == 50164
+
+                assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
 def check_port_okay(port):
