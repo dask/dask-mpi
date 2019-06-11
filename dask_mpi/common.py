@@ -2,7 +2,7 @@ from __future__ import print_function, division, absolute_import
 from functools import partial
 
 from distributed import Scheduler, Nanny, Worker
-from distributed.cli.utils import uri_from_host_port
+from distributed.comm.addressing import uri_from_host_port
 from distributed.utils import get_ip_interface
 from tornado import gen
 
