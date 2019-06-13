@@ -5,10 +5,16 @@ import sys
 
 import dask
 from distributed import Client
+
 from tornado import gen
 from tornado.ioloop import IOLoop
 
-from .common import get_host_from_interface, create_scheduler, run_scheduler, create_and_run_worker
+from .common import (
+    get_host_from_interface,
+    create_scheduler,
+    run_scheduler,
+    create_and_run_worker
+)
 
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
@@ -42,12 +48,13 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     bokeh_worker_port : int
         Worker's Bokeh port for visual diagnostics
     """
+
     host = get_host_from_interface(interface)
 
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    loop = IOLoop()
+    loop = IOLoop.current()
 
     if rank == 0:
         scheduler = create_scheduler(loop, host=host, bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
