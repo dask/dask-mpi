@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=3.6
   - dask
-  - distributed=1.25.2
+  - distributed
   - openmpi
   - mpi4py
   - pytest
@@ -14,4 +14,3 @@ dependencies:
   - coverage
   - requests
   - codecov
-  
