@@ -2,7 +2,7 @@
 Deploying Dask using MPI4Py
 ===========================
 
-|Gitter| |Circle| |Codecov| |Docs| |PyPI|
+|Gitter| |Circle| |Codecov| |Docs| |PyPI| |Conda|
 
 Easily deploy Dask Distributed in an existing MPI environment, such as one
 created with the ``mpirun`` or ``mpiexec`` MPI launch commands.  See documentation_
@@ -32,4 +32,8 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/dask-mpi.svg?style=for-the-badge
     :target: https://pypi.org/project/dask-mpi/
+    :alt: Python Package Index
+
+.. |Conda| image:: https://img.shields.io/conda/vn/conda-forge/dask-mpi.svg?style=for-the-badge
+    :target: https://anaconda.org/conda-forge/dask-mpi
     :alt: Python Package Index
