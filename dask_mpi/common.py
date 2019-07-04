@@ -68,7 +68,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
     worker = W(scheduler_file=scheduler_file,
                loop=loop,
                name='mpi-rank-%d' % rank,
-               ncores=nthreads,
+               nthreads=nthreads,
                local_dir=local_directory,
                services=services,
                memory_limit=memory_limit,
