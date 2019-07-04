@@ -14,3 +14,5 @@ dependencies:
   - coverage
   - requests
   - codecov
+  - jupyter-server-proxy
+  - click

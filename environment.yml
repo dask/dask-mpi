@@ -3,3 +3,5 @@ dependencies:
   - dask>=2.0
   - distributed>=2.0
   - mpi4py
+  - jupyter-server-proxy
+  - click
