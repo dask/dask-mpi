@@ -88,7 +88,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
     finally:
         @gen.coroutine
         def close():
-            yield worker._close(timeout=2)
+            yield worker.close(timeout=2)
 
         worker_loop.run_sync(close)
         worker_loop.close()
