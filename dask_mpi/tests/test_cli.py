@@ -118,7 +118,6 @@ def test_bokeh_scheduler(loop, mpirun):
             requests.get("http://localhost:59583/status/")
 
 
-@pytest.mark.skip
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
