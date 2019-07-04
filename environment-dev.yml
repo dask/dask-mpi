@@ -1,7 +1,7 @@
 name: dask-mpi-dev
 dependencies:
-  - dask
-  - distributed
+  - dask>=2.0
+  - distributed>=2.0
   - mpich
   - mpi4py
   - versioneer
@@ -9,3 +9,5 @@ dependencies:
   - pytest-cov
   - coverage
   - requests
+  - jupyter-server-proxy
+  - click

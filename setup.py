@@ -9,8 +9,8 @@ from setuptools import setup
 def environment_dependencies(obj, dependencies=None):
     if dependencies is None:
         dependencies = []
-    if isinstance(obj, string_types):
-        dependencies.append(obj.replace('=', '=='))
+    # if isinstance(obj, string_types):
+    #     dependencies.append(obj.replace('=', '=='))
     elif isinstance(obj, dict):
         if 'dependencies' in obj:
             environment_dependencies(obj['dependencies'], dependencies=dependencies)
@@ -41,6 +41,7 @@ setup(name='dask-mpi',
       license='BSD 3-Clause',
       include_package_data=True,
       install_requires=install_requires,
+      python_requires=">=3.5",
       packages=['dask_mpi'],
       long_description=long_description,
       entry_points="""

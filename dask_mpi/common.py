@@ -1,8 +1,7 @@
-from __future__ import print_function, division, absolute_import
 from functools import partial
 
 from distributed import Scheduler, Nanny, Worker
-from distributed.cli.utils import uri_from_host_port
+from distributed.comm.addressing import uri_from_host_port
 from distributed.utils import get_ip_interface
 from tornado import gen
 
@@ -18,7 +17,7 @@ def get_host_from_interface(interface=None):
 def create_scheduler(loop, scheduler_file=None, host=None, bokeh=True, bokeh_port=8787, bokeh_prefix=None,
                      scheduler_port=None):
     try:
-        from distributed.bokeh.scheduler import BokehScheduler
+        from distributed.dashboard import BokehScheduler
     except ImportError:
         BokehScheduler = None
 
@@ -47,7 +46,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
                           bokeh=True, bokeh_port=8789, bokeh_prefix=None,
                           worker_port=None, nanny_port=None):
     try:
-        from distributed.bokeh.worker import BokehWorker
+        from distributed.dashboard import BokehWorker
     except ImportError:
         BokehWorker = None
 
@@ -69,7 +68,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
     worker = W(scheduler_file=scheduler_file,
                loop=loop,
                name='mpi-rank-%d' % rank,
-               ncores=nthreads,
+               nthreads=nthreads,
                local_dir=local_directory,
                services=services,
                memory_limit=memory_limit,
@@ -89,7 +88,7 @@ def create_and_run_worker(loop, host=None, rank=0, scheduler_file=None, nanny=Fa
     finally:
         @gen.coroutine
         def close():
-            yield worker._close(timeout=2)
+            yield worker.close(timeout=2)
 
         worker_loop.run_sync(close)
         worker_loop.close()

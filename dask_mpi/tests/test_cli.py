@@ -88,7 +88,7 @@ def test_non_default_ports(loop, nanny, mpirun):
                         worker_addr)
                     assert worker_port == 58464
                     if nanny == "--nanny":
-                        nanny_port = worker_info['services']['nanny']
+                        _, nanny_port = get_address_host_port(worker_info['nanny'])
                         assert nanny_port == 50164
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
@@ -118,7 +118,6 @@ def test_bokeh_scheduler(loop, mpirun):
             requests.get("http://localhost:59583/status/")
 
 
-@pytest.mark.skip
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
