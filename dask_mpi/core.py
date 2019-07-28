@@ -1,22 +1,17 @@
+import asyncio
 import atexit
 import sys
 
 import dask
-from distributed import Client
+from dask.distributed import Client, Scheduler, Worker, Nanny
 
 from tornado import gen
 from tornado.ioloop import IOLoop
 
-from .common import (
-    get_host_from_interface,
-    create_scheduler,
-    run_scheduler,
-    create_and_run_worker
-)
-
 
 def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
-               bokeh=True, bokeh_port=8787, bokeh_prefix=None, bokeh_worker_port=8789):
+        dashboard=True, dashboard_address=":8787",
+        protocol=None):
     """
     Initialize a Dask cluster using mpi4py
 
@@ -46,41 +41,53 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     bokeh_worker_port : int
         Worker's Bokeh port for visual diagnostics
     """
-
-    host = get_host_from_interface(interface)
-
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     loop = IOLoop.current()
 
     if rank == 0:
-        scheduler = create_scheduler(loop, host=host, bokeh=bokeh, bokeh_port=bokeh_port, bokeh_prefix=bokeh_prefix)
-        addr = scheduler.address
-    else:
-        addr = None
+        async def run_scheduler():
+            async with Scheduler(
+                interface=interface,
+                protocol=protocol,
+                dashboard_address=dashboard_address,
+            ) as scheduler:
+                comm.bcast(scheduler.address, root=0)
+                comm.Barrier()
+                await scheduler.finished()
 
-    scheduler_address = comm.bcast(addr, root=0)
-    dask.config.set(scheduler_address=scheduler_address)
-    comm.Barrier()
-
-    if rank == 0:
-        run_scheduler(scheduler)
+        asyncio.get_event_loop().run_until_complete(run_scheduler())
         sys.exit()
-    elif rank == 1:
+
+    else:
+        scheduler_address = comm.bcast(None, root=0)
+        dask.config.set(scheduler_address=scheduler_address)
+        comm.Barrier()
+
+    if rank == 1:
         atexit.register(send_close_signal)
     else:
-        create_and_run_worker(loop, host=host, rank=rank, nanny=nanny, nthreads=nthreads,
-                              local_directory=local_directory, memory_limit=memory_limit,
-                              bokeh=bokeh, bokeh_port=bokeh_worker_port)
+        async def run_worker():
+            WorkerType = Nanny if nanny else Worker
+            async with WorkerType(
+                interface=interface,
+                protocol=protocol,
+                nthreads=nthreads,
+                memory_limit=memory_limit,
+                local_dir=local_directory,
+                name=rank,
+            ) as worker:
+                await worker.finished()
+
+        asyncio.get_event_loop().run_until_complete(run_worker())
         sys.exit()
 
 
 def send_close_signal():
-    @gen.coroutine
-    def stop(dask_scheduler):
-        yield dask_scheduler.close()
-        yield gen.sleep(0.1)
+    async def stop(dask_scheduler):
+        await dask_scheduler.close()
+        await gen.sleep(0.1)
         local_loop = dask_scheduler.loop
         local_loop.add_callback(local_loop.stop)
 
