@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.6
+  - pip
   - dask>=2.1
   - openmpi
   - mpi4py
