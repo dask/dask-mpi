@@ -61,6 +61,7 @@ def test_no_scheduler(loop, mpirun):
                         sleep(0.2)
 
 
+@pytest.mark.skip(reason="Should we explicilty expose --worker-port?")
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
 def test_non_default_ports(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
@@ -105,10 +106,11 @@ def check_port_okay(port):
             assert time() < start + 20
 
 
-def test_bokeh_scheduler(loop, mpirun):
+def test_dashboard(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, "--bokeh-port", "59583"]
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn,
+                "--dashboard-address", ":59583"]
 
         with popen(cmd, stdin=FNULL):
             check_port_okay(59583)
@@ -117,6 +119,7 @@ def test_bokeh_scheduler(loop, mpirun):
             requests.get("http://localhost:59583/status/")
 
 
+@pytest.mark.skip(reason="Should we expose this option?")
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
 

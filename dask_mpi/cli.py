@@ -46,8 +46,8 @@ def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
                 scheduler_file=scheduler_file,
                 dashboard_address=dashboard_address,
                 port=scheduler_port,
-            ) as scheduler:
-                await scheduler.finished()
+            ) as s:
+                await s.finished()
     else:
         async def run():
             WorkerType = Nanny if nanny else Worker
