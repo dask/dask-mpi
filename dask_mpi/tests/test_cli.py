@@ -29,13 +29,12 @@ def test_basic(loop, nanny, mpirun):
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
-
                 start = time()
                 while len(c.scheduler_info()["workers"]) != 3:
                     assert time() < start + 10
                     sleep(0.2)
 
-                assert c.submit(lambda x: x + 1, 10, workers="mpi-rank-1").result() == 11
+                assert c.submit(lambda x: x + 1, 10, workers=1).result() == 11
 
 
 def test_no_scheduler(loop, mpirun):
