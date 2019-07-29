@@ -14,3 +14,6 @@ dependencies:
   - requests
   - codecov
   - jupyter-server-proxy
+  - pip:
+    -  git+https://github.com/dask/dask.git
+    -  git+https://github.com/dask/distributed.git
