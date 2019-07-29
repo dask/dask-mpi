@@ -57,7 +57,7 @@ def main(scheduler_file, interface, nthreads, local_directory, memory_limit,
                 protocol=protocol,
                 nthreads=nthreads,
                 memory_limit=memory_limit,
-                local_dir=local_directory,
+                local_directory=local_directory,
                 name=rank,
             ) as worker:
                 await worker.finished()
