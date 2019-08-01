@@ -6,7 +6,7 @@ import os
 def allow_run_as_root():
     try:
         ALLOW_RUN_AS_ROOT = bool(os.environ.get("ALLOW_RUN_AS_ROOT"))
-    except:
+    except Exception:
         ALLOW_RUN_AS_ROOT = False
 
     return ALLOW_RUN_AS_ROOT
