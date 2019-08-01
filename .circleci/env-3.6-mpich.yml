@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=3.6
   - pip
-  - dask>=2.1
+  - dask>=2.2
   - mpich
   - mpi4py
   - pytest
@@ -15,6 +15,3 @@ dependencies:
   - requests
   - codecov
   - jupyter-server-proxy
-  - pip:
-    -  git+https://github.com/dask/dask.git
-    -  git+https://github.com/dask/distributed.git
