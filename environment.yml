@@ -1,7 +1,5 @@
 name: dask-mpi
 dependencies:
-  - dask>=2.0
-  - distributed>=2.0
+  - dask>=2.2
   - mpi4py
   - jupyter-server-proxy
-  - click

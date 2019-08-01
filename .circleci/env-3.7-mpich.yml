@@ -4,8 +4,8 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - dask>=2.0
-  - distributed>=2.0
+  - pip
+  - dask>=2.2
   - mpich
   - mpi4py
   - pytest
@@ -15,4 +15,3 @@ dependencies:
   - requests
   - codecov
   - jupyter-server-proxy
-  - click

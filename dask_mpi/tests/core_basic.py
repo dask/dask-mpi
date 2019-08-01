@@ -13,4 +13,5 @@ with Client() as c:
         assert time() < start + 10
         sleep(0.2)
 
-    assert c.submit(lambda x: x + 1, 10, workers="mpi-rank-2").result() == 11
+    assert c.submit(lambda x: x + 1, 10).result() == 11
+    assert c.submit(lambda x: x + 1, 20, workers=2).result() == 21
