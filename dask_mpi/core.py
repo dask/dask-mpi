@@ -9,9 +9,16 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 
 
-def initialize(interface=None, nthreads=1, local_directory='', memory_limit='auto', nanny=False,
-        dashboard=True, dashboard_address=":8787",
-        protocol=None):
+def initialize(
+    interface=None,
+    nthreads=1,
+    local_directory="",
+    memory_limit="auto",
+    nanny=False,
+    dashboard=True,
+    dashboard_address=":8787",
+    protocol=None,
+):
     """
     Initialize a Dask cluster using mpi4py
 
@@ -42,11 +49,13 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
         Worker's Bokeh port for visual diagnostics
     """
     from mpi4py import MPI
+
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     loop = IOLoop.current()
 
     if rank == 0:
+
         async def run_scheduler():
             async with Scheduler(
                 interface=interface,
@@ -68,6 +77,7 @@ def initialize(interface=None, nthreads=1, local_directory='', memory_limit='aut
     if rank == 1:
         atexit.register(send_close_signal)
     else:
+
         async def run_worker():
             WorkerType = Nanny if nanny else Worker
             async with WorkerType(

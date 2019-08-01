@@ -52,7 +52,14 @@ def test_no_scheduler(loop, mpirun):
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
-                cmd = mpirun + ["-np", "1", "dask-mpi", "--scheduler-file", fn, "--no-scheduler"]
+                cmd = mpirun + [
+                    "-np",
+                    "1",
+                    "dask-mpi",
+                    "--scheduler-file",
+                    fn,
+                    "--no-scheduler",
+                ]
 
                 with popen(cmd):
                     start = time()
@@ -66,10 +73,20 @@ def test_no_scheduler(loop, mpirun):
 def test_non_default_ports(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, nanny,
-                        "--scheduler-port", "56723",
-                        "--worker-port", "58464",
-                        "--nanny-port", "50164"]
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            nanny,
+            "--scheduler-port",
+            "56723",
+            "--worker-port",
+            "58464",
+            "--nanny-port",
+            "50164",
+        ]
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
@@ -80,15 +97,13 @@ def test_non_default_ports(loop, nanny, mpirun):
                     sleep(0.2)
 
                 sched_info = c.scheduler_info()
-                sched_host, sched_port = get_address_host_port(
-                    sched_info['address'])
+                sched_host, sched_port = get_address_host_port(sched_info["address"])
                 assert sched_port == 56723
-                for worker_addr, worker_info in sched_info['workers'].items():
-                    worker_host, worker_port = get_address_host_port(
-                        worker_addr)
+                for worker_addr, worker_info in sched_info["workers"].items():
+                    worker_host, worker_port = get_address_host_port(worker_addr)
                     assert worker_port == 58464
                     if nanny == "--nanny":
-                        _, nanny_port = get_address_host_port(worker_info['nanny'])
+                        _, nanny_port = get_address_host_port(worker_info["nanny"])
                         assert nanny_port == 50164
 
                 assert c.submit(lambda x: x + 1, 10).result() == 11
@@ -109,8 +124,15 @@ def check_port_okay(port):
 def test_dashboard(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn,
-                "--dashboard-address", ":59583"]
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--dashboard-address",
+            ":59583",
+        ]
 
         with popen(cmd, stdin=FNULL):
             check_port_okay(59583)
@@ -123,7 +145,15 @@ def test_dashboard(loop, mpirun):
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, "--bokeh-worker-port", "59584"]
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--bokeh-worker-port",
+            "59584",
+        ]
 
         with popen(cmd, stdin=FNULL):
             check_port_okay(59584)
