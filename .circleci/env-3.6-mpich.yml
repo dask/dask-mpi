@@ -15,3 +15,5 @@ dependencies:
   - requests
   - codecov
   - jupyter-server-proxy
+  - flake8
+  - black

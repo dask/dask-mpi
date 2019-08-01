@@ -131,6 +131,12 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+      - run:
+          name: Linting
+          command: |
+            source activate ${ENV_NAME}
+            black dask_mpi --check
+            flake8 dask_mpi
       - save_cache:
           key: deps-{{ .Branch }}-3.7-openmpi-{{ checksum ".circleci/env-3.7-openmpi.yml" }}
           paths:
