@@ -16,6 +16,7 @@ dependencies:
   - jupyter-server-proxy
   - flake8
   - black
+  - psutil
   - pip:
     - git+https://github.com/dask/dask.git
     - git+https://github.com/dask/distributed.git
