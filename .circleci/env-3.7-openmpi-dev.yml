@@ -1,0 +1,21 @@
+name: dask-mpi-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - pip
+  - mpich
+  - mpi4py
+  - pytest
+  - pytest-icdiff
+  - pytest-cov
+  - coverage
+  - requests
+  - codecov
+  - jupyter-server-proxy
+  - flake8
+  - black
+  - pip:
+    - git+https://github.com/dask/dask.git
+    - git+https://github.com/dask/distributed.git
