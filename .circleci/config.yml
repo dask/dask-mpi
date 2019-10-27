@@ -16,7 +16,7 @@ jobs:
 
   test-3.6-mpich:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.6"
@@ -40,17 +40,14 @@ jobs:
           paths:
             - "/opt/conda/envs/${ENV_NAME}/"
             - "/opt/conda/pkgs"
-      - run:
-          name: Code Coverage
-          command: |
-            source activate ${ENV_NAME}
 
-            echo "[Uploading Coverage]"
-            codecov
+      - store_test_results:
+          path: test-reports
+
 
   test-3.6-openmpi:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.6"
@@ -71,6 +68,11 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+
+      - store_test_results:
+         path: test-reports
+
+   
       - save_cache:
           key: deps-{{ .Branch }}-3.6-openmpi-{{ checksum ".circleci/env-3.6-openmpi.yml" }}
           paths:
@@ -79,7 +81,7 @@ jobs:
 
   test-3.7-mpich:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.7"
@@ -98,6 +100,10 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+
+      - store_test_results:
+         path: test-reports
+
       - save_cache:
           key: deps-{{ .Branch }}-3.7-mpich-{{ checksum ".circleci/env-3.7-mpich.yml" }}
           paths:
@@ -113,7 +119,7 @@ jobs:
 
   test-3.7-openmpi:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.7"
@@ -134,6 +140,8 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+      - store_test_results:
+         path: test-reports
       - run:
           name: Linting
           command: |
@@ -149,7 +157,7 @@ jobs:
 
   test-3.7-mpich-upstream-dev:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.7"
@@ -168,6 +176,10 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+
+      - store_test_results:
+          path: test-reports
+
       - save_cache:
           key: deps-{{ .Branch }}-3.7-mpich-upstream-dev{{ checksum ".circleci/env-3.7-mpich-upstream-dev.yml" }}
           paths:
@@ -176,7 +188,7 @@ jobs:
 
   test-3.7-openmpi-upstream-dev:
     docker:
-      - image: continuumio/miniconda:latest
+      - image: continuumio/miniconda3:latest
 
     environment:
       PYTHON: "3.7"
@@ -197,6 +209,10 @@ jobs:
           command: |
             source activate ${ENV_NAME}
             pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+
+      - store_test_results:
+          path: test-reports
+          
       - save_cache:
           key: deps-{{ .Branch }}-3.7-openmpi-upstream-dev{{ checksum ".circleci/env-3.7-openmpi-upstream-dev.yml" }}
           paths:
