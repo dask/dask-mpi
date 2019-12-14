@@ -2,7 +2,9 @@ import click
 
 import asyncio
 from mpi4py import MPI
-from dask.distributed import Scheduler, Worker, Nanny
+
+import dask
+from dask.distributed import Client, Scheduler, Worker, Nanny
 from distributed.cli.utils import check_python_3
 
 comm = MPI.COMM_WORLD
@@ -72,24 +74,29 @@ def main(
     protocol,
 ):
 
-    if rank == 0 and scheduler:
+    if rank == 0:
 
-        async def run():
+        async def run_scheduler():
             async with Scheduler(
                 interface=interface,
                 protocol=protocol,
-                scheduler_file=scheduler_file,
                 dashboard_address=dashboard_address,
-                port=scheduler_port,
-            ) as s:
-                await s.finished()
+            ) as scheduler:
+                comm.bcast(scheduler.address, root=0)
+                comm.Barrier()
+                await scheduler.finished()
+
+        asyncio.get_event_loop().run_until_complete(run_scheduler())
+        sys.exit()
 
     else:
+        scheduler_address = comm.bcast(None, root=0)
+        dask.config.set(scheduler_address=scheduler_address)
+        comm.Barrier()
 
-        async def run():
+        async def run_worker():
             WorkerType = Nanny if nanny else Worker
             async with WorkerType(
-                scheduler_file=scheduler_file,
                 interface=interface,
                 protocol=protocol,
                 nthreads=nthreads,
@@ -99,8 +106,8 @@ def main(
             ) as worker:
                 await worker.finished()
 
-    asyncio.get_event_loop().run_until_complete(run())
-
+        asyncio.get_event_loop().run_until_complete(run_worker())
+        sys.exit()
 
 def go():
     check_python_3()
