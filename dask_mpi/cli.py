@@ -1,15 +1,13 @@
 import click
 
 import asyncio
-from mpi4py import MPI
+import sys
 
 import dask
 from dask.distributed import Client, Scheduler, Worker, Nanny
 from distributed.cli.utils import check_python_3
 
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-
+from mpi4py import MPI
 
 @click.command()
 @click.option(
@@ -73,6 +71,9 @@ def main(
     scheduler_port,
     protocol,
 ):
+
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
 
     if rank == 0 and scheduler:
 
