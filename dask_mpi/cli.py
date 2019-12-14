@@ -74,7 +74,7 @@ def main(
     protocol,
 ):
 
-    if rank == 0:
+    if rank == 0 and scheduler:
 
         async def run_scheduler():
             async with Scheduler(
