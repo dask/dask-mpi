@@ -25,7 +25,7 @@ FNULL = open(os.devnull, "w")  # hide output of subprocess
 def test_basic(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "4", "dask-mpi", "--scheduler-file", fn, nanny]
+        cmd = mpirun + ["-np", "4", "dask-mpi", "--scheduler-file", fn, nanny, "&"]
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
@@ -40,7 +40,7 @@ def test_basic(loop, nanny, mpirun):
 def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
+        cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn, "&"]
 
         with popen(cmd, stdin=FNULL):
             with Client(scheduler_file=fn) as c:
@@ -59,6 +59,7 @@ def test_no_scheduler(loop, mpirun):
                     "--scheduler-file",
                     fn,
                     "--no-scheduler",
+                    "&",
                 ]
 
                 with popen(cmd):
@@ -86,6 +87,7 @@ def test_non_default_ports(loop, nanny, mpirun):
             "58464",
             "--nanny-port",
             "50164",
+            "&",
         ]
 
         with popen(cmd):
@@ -132,6 +134,7 @@ def test_dashboard(loop, mpirun):
             fn,
             "--dashboard-address",
             ":59583",
+            "&",
         ]
 
         with popen(cmd, stdin=FNULL):
@@ -153,6 +156,7 @@ def test_bokeh_worker(loop, mpirun):
             fn,
             "--bokeh-worker-port",
             "59584",
+            "&",
         ]
 
         with popen(cmd, stdin=FNULL):
