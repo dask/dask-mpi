@@ -3,10 +3,11 @@ import click
 import asyncio
 
 import dask
-from dask.distributed import Client, Scheduler, Worker, Nanny
+from dask.distributed import Scheduler, Worker, Nanny
 from distributed.cli.utils import check_python_3
 
 from mpi4py import MPI
+
 
 @click.command()
 @click.option(
@@ -88,7 +89,7 @@ def main(
                 await s.finished()
 
         asyncio.get_event_loop().run_until_complete(run_scheduler())
- 
+
     else:
         scheduler_address = comm.bcast(None, root=0)
         dask.config.set(scheduler_address=scheduler_address)
@@ -108,6 +109,7 @@ def main(
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())
+
 
 def go():
     check_python_3()
