@@ -2,7 +2,6 @@ import click
 
 import asyncio
 
-import dask
 from dask.distributed import Scheduler, Worker, Nanny
 from distributed.cli.utils import check_python_3
 
@@ -88,7 +87,6 @@ def main(
                 await s.finished()
 
         asyncio.get_event_loop().run_until_complete(run_scheduler())
-
 
     else:
         comm.Barrier()
