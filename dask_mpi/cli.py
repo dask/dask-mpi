@@ -1,7 +1,6 @@
 import click
 
 import asyncio
-import sys
 
 import dask
 from dask.distributed import Client, Scheduler, Worker, Nanny
@@ -82,14 +81,14 @@ def main(
                 interface=interface,
                 protocol=protocol,
                 dashboard_address=dashboard_address,
-            ) as scheduler:
-                comm.bcast(scheduler.address, root=0)
+                scheduler_file=scheduler_file,
+            ) as s:
+                comm.bcast(s.address, root=0)
                 comm.Barrier()
-                await scheduler.finished()
+                await s.finished()
 
         asyncio.get_event_loop().run_until_complete(run_scheduler())
-        sys.exit()
-
+ 
     else:
         scheduler_address = comm.bcast(None, root=0)
         dask.config.set(scheduler_address=scheduler_address)
@@ -104,11 +103,11 @@ def main(
                 memory_limit=memory_limit,
                 local_directory=local_directory,
                 name=rank,
+                scheduler_file=scheduler_file,
             ) as worker:
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())
-        sys.exit()
 
 def go():
     check_python_3()
