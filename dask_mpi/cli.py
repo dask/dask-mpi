@@ -84,15 +84,13 @@ def main(
                 dashboard_address=dashboard_address,
                 scheduler_file=scheduler_file,
             ) as s:
-                comm.bcast(s.address, root=0)
                 comm.Barrier()
                 await s.finished()
 
         asyncio.get_event_loop().run_until_complete(run_scheduler())
 
+
     else:
-        scheduler_address = comm.bcast(None, root=0)
-        dask.config.set(scheduler_address=scheduler_address)
         comm.Barrier()
 
         async def run_worker():
