@@ -197,8 +197,7 @@ def test_stale_sched(loop, nanny, mpirun):
     with open(fn, "w") as f:
         json.dump(stale_json, f)
 
-    cmd = [
-        "mpirun",
+    cmd = mpirun + [
         "-np",
         "4",
         "dask-mpi",
@@ -218,8 +217,7 @@ def test_stale_sched(loop, nanny, mpirun):
     with open(fn) as f:
         new_json = json.load(f)
 
-    assert new_json != stale_json
-
-    # clean up
     os.close(fhandle)
     os.remove(fn)
+
+    assert new_json != stale_json
