@@ -114,3 +114,10 @@ venv.bak/
 global.lock
 purge.lock
 /temp/
+/dask-worker-space/
+
+# VSCode files
+.vscode/
+
+# DevContainer extension files
+.devcontainer/
