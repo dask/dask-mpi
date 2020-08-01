@@ -82,6 +82,7 @@ def main(
                 protocol=protocol,
                 dashboard_address=dashboard_address,
                 scheduler_file=scheduler_file,
+                port=scheduler_port
             ) as s:
                 comm.Barrier()
                 await s.finished()
