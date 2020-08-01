@@ -18,6 +18,7 @@ def initialize(
     dashboard=True,
     dashboard_address=":8787",
     protocol=None,
+    scheduler_port=None
 ):
     """
     Initialize a Dask cluster using mpi4py
@@ -39,6 +40,8 @@ def initialize(
         integer (nbytes), float (fraction of total memory), or 'auto'.
     nanny : bool
         Start workers in nanny process for management
+    scheduler_port :int
+        Use this port as the scheduler port workers connect to
     bokeh : bool
         Enable Bokeh visual diagnostics
     bokeh_port : int
@@ -60,6 +63,7 @@ def initialize(
             async with Scheduler(
                 interface=interface,
                 protocol=protocol,
+                port=scheduler_port,
                 dashboard_address=dashboard_address,
             ) as scheduler:
                 comm.bcast(scheduler.address, root=0)
