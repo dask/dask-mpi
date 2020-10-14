@@ -9,15 +9,20 @@ from mpi4py import MPI
 
 
 @click.command()
+@click.argument("scheduler_address",
+    type=str,
+    required=False
+)
+
 @click.option(
     "--scheduler-file",
     type=str,
-    default="scheduler.json",
+    default=None,
     help="Filename to JSON encoded scheduler information.",
 )
 @click.option(
     "--scheduler-port",
-    default=0,
+    default=None,
     type=int,
     help="Specify scheduler port number.  Defaults to random.",
 )
@@ -25,9 +30,9 @@ from mpi4py import MPI
     "--interface", type=str, default=None, help="Network interface like 'eth0' or 'ib0'"
 )
 @click.option(
-    "--protocol", type=str, default="tcp", help="Network protocol to use like TCP"
+    "--protocol", type=str, default=None, help="Network protocol to use like TCP"
 )
-@click.option("--nthreads", type=int, default=0, help="Number of threads per worker.")
+@click.option("--nthreads", type=int, default=None, help="Number of threads per worker.")
 @click.option(
     "--memory-limit",
     default="auto",
@@ -37,7 +42,7 @@ from mpi4py import MPI
     "or 'auto'",
 )
 @click.option(
-    "--local-directory", default="", type=str, help="Directory to place worker files"
+    "--local-directory", default=None, type=str, help="Directory to place worker files"
 )
 @click.option(
     "--scheduler/--no-scheduler",
@@ -55,10 +60,17 @@ from mpi4py import MPI
 @click.option(
     "--dashboard-address",
     type=str,
-    default=":8787",
+    default=None,
     help="Address for visual diagnostics dashboard",
 )
+@click.option(
+    "--name",
+    type=str,
+    default="dask_mpi",
+    help="Name prefix for each worker, to which dask-mpi appends ``-<worker_rank>``.",
+)
 def main(
+    scheduler_address,
     scheduler_file,
     interface,
     nthreads,
@@ -69,6 +81,7 @@ def main(
     nanny,
     scheduler_port,
     protocol,
+    name
 ):
 
     comm = MPI.COMM_WORLD
@@ -94,12 +107,13 @@ def main(
         async def run_worker():
             WorkerType = Nanny if nanny else Worker
             async with WorkerType(
+                scheduler_ip=scheduler_address,
                 interface=interface,
                 protocol=protocol,
                 nthreads=nthreads,
                 memory_limit=memory_limit,
                 local_directory=local_directory,
-                name=rank,
+                name=f"{name}-{rank}",
                 scheduler_file=scheduler_file,
             ) as worker:
                 await worker.finished()
