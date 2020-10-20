@@ -8,7 +8,7 @@ the running of the ``mpirun`` or ``mpiexec`` commands.
 
 .. code-block:: bash
 
-   mpirun -np 8 dask-mpi --no-nannies --scheduler-file ~/scheduler.json
+   mpirun -np 8 dask-mpi --no-nanny --scheduler-file ~/scheduler.json
 
 or
 
