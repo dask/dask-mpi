@@ -1,0 +1,15 @@
+name: dask-mpi-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - dask>=2.2
+  - openmpi
+  - mpi4py
+  - pytest
+  - pytest-icdiff
+  - pytest-cov
+  - coverage
+  - requests
+  - codecov
+  - jupyter-server-proxy
