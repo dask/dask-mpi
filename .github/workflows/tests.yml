@@ -39,7 +39,7 @@ jobs:
           path: ~/conda_pkgs_dir
           key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles( env.ENV_FILE ) }}
       - name: Setup miniconda
-        uses: goanpeca/setup-miniconda@v1
+        uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: dask-mpi-dev # Defined in ci/env-mpi.yml
           auto-update-conda: false
