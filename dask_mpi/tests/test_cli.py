@@ -1,28 +1,21 @@
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import, division, print_function
 
+import json
 import os
-
+import subprocess
+import tempfile
 from time import sleep
 
 import pytest
-
-pytest.importorskip("mpi4py")
-
 import requests
-
-import json
-
-import tempfile
-
-import subprocess
-
 from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
 from distributed.utils import tmpfile
-from distributed.utils_test import popen
 from distributed.utils_test import loop  # noqa: F401
+from distributed.utils_test import popen
 
+pytest.importorskip("mpi4py")
 
 FNULL = open(os.devnull, "w")  # hide output of subprocess
 

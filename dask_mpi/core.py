@@ -3,8 +3,7 @@ import atexit
 import sys
 
 import dask
-from dask.distributed import Client, Scheduler, Worker, Nanny
-
+from dask.distributed import Client, Nanny, Scheduler, Worker
 from tornado import gen
 from tornado.ioloop import IOLoop
 

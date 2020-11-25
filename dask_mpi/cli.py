@@ -1,10 +1,8 @@
-import click
-
 import asyncio
 
-from dask.distributed import Scheduler, Worker, Nanny
+import click
+from dask.distributed import Nanny, Scheduler, Worker
 from distributed.cli.utils import check_python_3
-
 from mpi4py import MPI
 
 
