@@ -1,8 +1,9 @@
-import versioneer
-import yaml
-
 from os.path import exists
+
+import yaml
 from setuptools import setup
+
+import versioneer
 
 
 def environment_dependencies(obj, dependencies=None):
