@@ -20,7 +20,7 @@ BSD 3-Clause (See `License File <https://github.com/dask/dask-mpi/blob/master/LI
    :alt: Join the chat at https://gitter.im/dask/dask
    :target: https://gitter.im/dask/dask?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-.. |GHActions| image:: https://github.com/dask/dask-mpi/workflows/Tests/badge.svg
+.. |GHActions| image:: https://img.shields.io/github/workflow/status/dask/dask-mpi/Tests?style=for-the-badge
     :target: https://github.com/dask/dask-mpi/actions?query=workflow%3ATests
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/dask/dask-mpi.svg?style=for-the-badge
