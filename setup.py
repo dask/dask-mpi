@@ -36,7 +36,12 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Deploy Dask using mpi4py",
-    url="https://github.com/dask/dask-mpi",  # TODO: Update to docs when docs complete
+    url="https://github.com/dask/dask-mpi",
+    project_urls={
+        "Documentation": "https://mpi.dask.org/",
+        "Source": "https://github.com/dask/dask-mpi",
+        "Tracker": "https://github.com/dask/dask-mpi/issues",
+    },
     maintainer="Kevin Paul",
     maintainer_email="kpaul@ucar.edu",
     license="BSD 3-Clause",
