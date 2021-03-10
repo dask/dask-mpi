@@ -10,6 +10,7 @@ dependencies:
   - versioneer
   - sphinx
   - pygments
+  - pip
   - pip:
     - dask_sphinx_theme
     - numpydoc
