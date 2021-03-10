@@ -1,9 +1,12 @@
 name: dask-mpi-docs
+channels:
+  - conda-forge 
+  - nodefaults
 dependencies:
-  - dask
-  - distributed=1.25.2
+  - dask>=2.19
+  - distributed>=2.19
   - mpich
-  - mpi4py
+  - mpi4py>=3.0.3
   - versioneer
   - sphinx
   - pygments
