@@ -53,3 +53,34 @@ Nannies) will be terminated.
    resources used by the ``mpirun`` command.
 
 For more details on the ``initialize()`` method, see the :ref:`api`.
+
+Connecting to Dashboard
+-----------------------
+
+Due to the fact that Dask might be initialized on a node that isn't the login node
+a simple port forwarding can be insufficient to connect to a dashboard.
+
+To find out which node is the one hosting the dashboard append initialization code with location logging:
+
+.. code-block:: python
+
+   from dask_mpi import initialize
+   initialize()
+
+   from dask.distributed import Client
+   from distributed.scheduler import logger
+   import socket
+
+   client = Client()
+
+   host = client.run_on_scheduler(socket.gethostname)
+   port = client.scheduler_info()['services']['dashboard']
+   login_node_address = "supercomputer.university.edu" # Provide address/domain of login node
+
+   logger.info(f"ssh -N -L {port}:{host}:{port} {login_node_address}")
+
+Then in batch job output file search for the logged line and use in your terminal::
+
+   ssh -N -L PORT_NUMBER:node03:PORT_NUMBER supercomputer.university.edu
+
+The Bokeh Dashboard will be available at ``localhost:PORT_NUMBER``.
