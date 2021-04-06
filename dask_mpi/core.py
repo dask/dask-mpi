@@ -38,14 +38,12 @@ def initialize(
         integer (nbytes), float (fraction of total memory), or 'auto'.
     nanny : bool
         Start workers in nanny process for management
-    bokeh : bool
+    dashboard : bool
         Enable Bokeh visual diagnostics
-    bokeh_port : int
+    dashboard_address : str
         Bokeh port for visual diagnostics
-    bokeh_prefix : str
-        Prefix for the bokeh app
-    bokeh_worker_port : int
-        Worker's Bokeh port for visual diagnostics
+    protocol : str
+        Protocol like 'inproc' or 'tcp'
     """
     from mpi4py import MPI
 
@@ -59,6 +57,7 @@ def initialize(
             async with Scheduler(
                 interface=interface,
                 protocol=protocol,
+                dashboard=dashboard,
                 dashboard_address=dashboard_address,
             ) as scheduler:
                 comm.bcast(scheduler.address, root=0)
