@@ -1,11 +1,49 @@
-import asyncio
 import atexit
-import sys
 
 import dask
-from dask.distributed import Client, Nanny, Scheduler, Worker
-from tornado import gen
-from tornado.ioloop import IOLoop
+from dask.distributed import Scheduler
+from distributed.deploy.runner import Runner, Role
+
+_RUNNER_REF = None
+
+
+class MPIRunner(Runner):
+    def __init__(self, *args, **kwargs):
+        from mpi4py import MPI
+
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
+        super().__init__(*args, **kwargs)
+
+    async def get_role(self) -> str:
+        if self.rank == 0 and self.scheduler:
+            return Role.scheduler
+        elif self.rank == 1 and self.client:
+            return Role.client
+        else:
+            return Role.worker
+
+    async def set_scheduler_address(self, scheduler: Scheduler) -> None:
+        self.comm.bcast(scheduler.address, root=0)
+
+    async def get_scheduler_address(self) -> str:
+        return self.comm.bcast(None, root=0)
+
+    async def on_scheduler_start(self, scheduler: Scheduler) -> None:
+        self.comm.Barrier()
+
+    async def before_worker_start(self) -> None:
+        self.comm.Barrier()
+
+    async def before_client_start(self) -> None:
+        self.comm.Barrier()
+
+    async def get_worker_name(self) -> str:
+        return self.rank
+
+    async def _close(self):
+        await super()._close()
+        self.comm.Abort()
 
 
 def initialize(
@@ -45,59 +83,26 @@ def initialize(
     protocol : str
         Protocol like 'inproc' or 'tcp'
     """
-    from mpi4py import MPI
-
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    loop = IOLoop.current()
-
-    if rank == 0:
-
-        async def run_scheduler():
-            async with Scheduler(
-                interface=interface,
-                protocol=protocol,
-                dashboard=dashboard,
-                dashboard_address=dashboard_address,
-            ) as scheduler:
-                comm.bcast(scheduler.address, root=0)
-                comm.Barrier()
-                await scheduler.finished()
-
-        asyncio.get_event_loop().run_until_complete(run_scheduler())
-        sys.exit()
-
-    else:
-        scheduler_address = comm.bcast(None, root=0)
-        dask.config.set(scheduler_address=scheduler_address)
-        comm.Barrier()
-
-    if rank == 1:
-        atexit.register(send_close_signal)
-    else:
-
-        async def run_worker():
-            WorkerType = Nanny if nanny else Worker
-            async with WorkerType(
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_directory=local_directory,
-                name=rank,
-            ) as worker:
-                await worker.finished()
-
-        asyncio.get_event_loop().run_until_complete(run_worker())
-        sys.exit()
-
-
-def send_close_signal():
-    async def stop(dask_scheduler):
-        await dask_scheduler.close()
-        await gen.sleep(0.1)
-        local_loop = dask_scheduler.loop
-        local_loop.add_callback(local_loop.stop)
-
-    with Client() as c:
-        c.run_on_scheduler(stop, wait=False)
+    scheduler_options = {
+        "interface": interface,
+        "protocol": protocol,
+        "dashboard": dashboard,
+        "dashboard_address": dashboard_address,
+    }
+    worker_options = {
+        "interface": interface,
+        "protocol": protocol,
+        "nthreads": nthreads,
+        "memory_limit": memory_limit,
+        "local_directory": local_directory,
+    }
+    worker_class = "dask.distributed.Nanny" if nanny else "dask.distributed.Worker"
+    runner = MPIRunner(
+        scheduler_options=scheduler_options,
+        worker_class=worker_class,
+        worker_options=worker_options,
+    )
+    dask.config.set(scheduler_address=runner.scheduler_address)
+    _RUNNER_REF = runner  # Keep a reference to avoid gc
+    atexit.register(_RUNNER_REF.close)
+    return runner

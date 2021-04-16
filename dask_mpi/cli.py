@@ -1,9 +1,7 @@
-import asyncio
-
 import click
-from dask.distributed import Nanny, Scheduler, Worker
 from distributed.cli.utils import check_python_3
-from mpi4py import MPI
+
+from .core import MPIRunner
 
 
 @click.command()
@@ -68,41 +66,28 @@ def main(
     scheduler_port,
     protocol,
 ):
-
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-
-    if rank == 0 and scheduler:
-
-        async def run_scheduler():
-            async with Scheduler(
-                interface=interface,
-                protocol=protocol,
-                dashboard_address=dashboard_address,
-                scheduler_file=scheduler_file,
-            ) as s:
-                comm.Barrier()
-                await s.finished()
-
-        asyncio.get_event_loop().run_until_complete(run_scheduler())
-
-    else:
-        comm.Barrier()
-
-        async def run_worker():
-            WorkerType = Nanny if nanny else Worker
-            async with WorkerType(
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_directory=local_directory,
-                name=rank,
-                scheduler_file=scheduler_file,
-            ) as worker:
-                await worker.finished()
-
-        asyncio.get_event_loop().run_until_complete(run_worker())
+    scheduler_options = {
+        "scheduler_file": scheduler_file,
+        "interface": interface,
+        "protocol": protocol,
+        "dashboard_address": dashboard_address,
+    }
+    worker_options = {
+        "scheduler_file": scheduler_file,
+        "interface": interface,
+        "protocol": protocol,
+        "nthreads": nthreads,
+        "memory_limit": memory_limit,
+        "local_directory": local_directory,
+    }
+    worker_class = "dask.distributed.Nanny" if nanny else "dask.distributed.Worker"
+    MPIRunner(
+        scheduler=scheduler,
+        scheduler_options=scheduler_options,
+        worker_class=worker_class,
+        worker_options=worker_options,
+        client=False,
+    )
 
 
 def go():
