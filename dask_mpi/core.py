@@ -2,7 +2,7 @@ import atexit
 
 import dask
 from dask.distributed import Scheduler
-from distributed.deploy.runner import Runner, Role
+from distributed.deploy.runner import Role, Runner
 
 _RUNNER_REF = None
 
