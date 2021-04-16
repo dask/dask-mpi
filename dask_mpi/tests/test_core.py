@@ -17,4 +17,17 @@ def test_basic(mpirun):
     p = subprocess.Popen(mpirun + ["-np", "4", sys.executable, script_file])
 
     p.communicate()
+    print("mpirun ended")
+    assert p.returncode == 0
+
+
+def test_context(mpirun):
+    script_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "core_context.py"
+    )
+
+    p = subprocess.Popen(mpirun + ["-np", "4", sys.executable, script_file])
+
+    p.communicate()
+    print("mpirun ended")
     assert p.returncode == 0

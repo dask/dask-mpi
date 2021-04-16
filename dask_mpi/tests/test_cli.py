@@ -20,7 +20,7 @@ pytest.importorskip("mpi4py")
 FNULL = open(os.devnull, "w")  # hide output of subprocess
 
 
-@pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
+@pytest.mark.parametrize("nanny", ["--no-nanny", "--nanny"])
 def test_basic(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
 
