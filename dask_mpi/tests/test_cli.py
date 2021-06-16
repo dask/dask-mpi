@@ -11,7 +11,7 @@ import requests
 from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
-from distributed.utils import tmpfile, import_term
+from distributed.utils import import_term, tmpfile
 from distributed.utils_test import loop  # noqa: F401
 from distributed.utils_test import popen
 

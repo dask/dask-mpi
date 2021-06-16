@@ -3,7 +3,7 @@ import atexit
 import sys
 
 import dask
-from dask.distributed import Client, Nanny, Scheduler, Worker
+from dask.distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
 from tornado import gen
 from tornado.ioloop import IOLoop
@@ -93,15 +93,16 @@ def initialize(
                     "Option nanny=True is deprectaed, use worker_class='distributed.Nanny' instead"
                 )
                 WorkerType = Nanny
-            async with WorkerType(
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_directory=local_directory,
-                name=rank,
-                **worker_options
-            ) as worker:
+            opts = {
+                "interface": interface,
+                "protocol": protocol,
+                "nthreads": nthreads,
+                "memory_limit": memory_limit,
+                "local_directory": local_directory,
+                "name": rank,
+                **worker_options,
+            }
+            async with WorkerType(**opts) as worker:
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())

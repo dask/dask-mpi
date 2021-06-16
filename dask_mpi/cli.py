@@ -1,10 +1,10 @@
 import asyncio
+import json
 
 import click
-import json
-from dask.distributed import Nanny, Scheduler, Worker
-from distributed.utils import import_term
+from dask.distributed import Scheduler, Worker
 from distributed.cli.utils import check_python_3
+from distributed.utils import import_term
 from mpi4py import MPI
 
 
@@ -117,16 +117,17 @@ def main(
                     "Option --no-nanny is deprectaed, use --worker-class instead"
                 )
                 WorkerType = Worker
-            async with WorkerType(
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_directory=local_directory,
-                name=rank,
-                scheduler_file=scheduler_file,
-                **worker_options
-            ) as worker:
+            opts = {
+                "interface": interface,
+                "protocol": protocol,
+                "nthreads": nthreads,
+                "memory_limit": memory_limit,
+                "local_directory": local_directory,
+                "name": rank,
+                "scheduler_file": scheduler_file,
+                **worker_options,
+            }
+            async with WorkerType(**opts) as worker:
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())
