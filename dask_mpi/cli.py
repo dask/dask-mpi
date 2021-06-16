@@ -1,7 +1,9 @@
 import asyncio
 
 import click
+import json
 from dask.distributed import Nanny, Scheduler, Worker
+from distributed.utils import import_term
 from distributed.cli.utils import check_python_3
 from mpi4py import MPI
 
@@ -25,7 +27,7 @@ from mpi4py import MPI
 @click.option(
     "--protocol", type=str, default="tcp", help="Network protocol to use like TCP"
 )
-@click.option("--nthreads", type=int, default=0, help="Number of threads per worker.")
+@click.option("--nthreads", type=int, default=1, help="Number of threads per worker.")
 @click.option(
     "--memory-limit",
     default="auto",
@@ -48,7 +50,19 @@ from mpi4py import MPI
 @click.option(
     "--nanny/--no-nanny",
     default=True,
-    help="Start workers in nanny process for management",
+    help="Start workers in nanny process for management (deprecated use --worker-class instead)",
+)
+@click.option(
+    "--worker-class",
+    type=str,
+    default="distributed.Nanny",
+    help="Class to use when creating workers",
+)
+@click.option(
+    "--worker-options",
+    type=str,
+    default=None,
+    help="JSON serialised dict of options to pass to workers",
 )
 @click.option(
     "--dashboard-address",
@@ -65,12 +79,19 @@ def main(
     scheduler,
     dashboard_address,
     nanny,
+    worker_class,
+    worker_options,
     scheduler_port,
     protocol,
 ):
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+
+    try:
+        worker_options = json.loads(worker_options)
+    except TypeError:
+        worker_options = {}
 
     if rank == 0 and scheduler:
 
@@ -90,7 +111,12 @@ def main(
         comm.Barrier()
 
         async def run_worker():
-            WorkerType = Nanny if nanny else Worker
+            WorkerType = import_term(worker_class)
+            if not nanny:
+                raise DeprecationWarning(
+                    "Option --no-nanny is deprectaed, use --worker-class instead"
+                )
+                WorkerType = Worker
             async with WorkerType(
                 interface=interface,
                 protocol=protocol,
@@ -99,6 +125,7 @@ def main(
                 local_directory=local_directory,
                 name=rank,
                 scheduler_file=scheduler_file,
+                **worker_options
             ) as worker:
                 await worker.finished()
 

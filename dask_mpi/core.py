@@ -4,6 +4,7 @@ import sys
 
 import dask
 from dask.distributed import Client, Nanny, Scheduler, Worker
+from distributed.utils import import_term
 from tornado import gen
 from tornado.ioloop import IOLoop
 
@@ -17,6 +18,8 @@ def initialize(
     dashboard=True,
     dashboard_address=":8787",
     protocol=None,
+    worker_class="distributed.Worker",
+    worker_options=None,
 ):
     """
     Initialize a Dask cluster using mpi4py
@@ -37,19 +40,26 @@ def initialize(
         Number of bytes before spilling data to disk.  This can be an
         integer (nbytes), float (fraction of total memory), or 'auto'.
     nanny : bool
-        Start workers in nanny process for management
+        Start workers in nanny process for management (deprecated, use worker_class instead)
     dashboard : bool
         Enable Bokeh visual diagnostics
     dashboard_address : str
         Bokeh port for visual diagnostics
     protocol : str
         Protocol like 'inproc' or 'tcp'
+    worker_class : str
+        Class to use when creating workers
+    worker_options : dict
+        Options to pass to workers
     """
     from mpi4py import MPI
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     loop = IOLoop.current()
+
+    if not worker_options:
+        worker_options = {}
 
     if rank == 0:
 
@@ -77,7 +87,12 @@ def initialize(
     else:
 
         async def run_worker():
-            WorkerType = Nanny if nanny else Worker
+            WorkerType = import_term(worker_class)
+            if nanny:
+                raise DeprecationWarning(
+                    "Option nanny=True is deprectaed, use worker_class='distributed.Nanny' instead"
+                )
+                WorkerType = Nanny
             async with WorkerType(
                 interface=interface,
                 protocol=protocol,
@@ -85,6 +100,7 @@ def initialize(
                 memory_limit=memory_limit,
                 local_directory=local_directory,
                 name=rank,
+                **worker_options
             ) as worker:
                 await worker.finished()
 
