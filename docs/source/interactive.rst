@@ -53,14 +53,14 @@ Scheduler (whose address is in the scheduler JSON file).
 .. warning:: **MPI Jobs and Dask Nannies**
 
    It is many times useful to launch your Dask-MPI cluster (using ``dask-mpi``) with Dask Nannies
-   (i.e., with the ``--nanny`` option), rather than strictly with Dask Workers.  This is because
-   the Dask Nannies can relaunch a worker when a failure occurs.  However, in some MPI environments,
-   Dask Nannies will not be able to work as expected.  This is because some installations of MPI
-   may restrict the number of actual running processes from exceeding the number of MPI ranks
+   (i.e., with the ``--worker-class distributed.Nanny`` option), rather than strictly with Dask Workers.
+   This is because the Dask Nannies can relaunch a worker when a failure occurs. However, in some MPI
+   environments, Dask Nannies will not be able to work as expected.  This is because some installations
+   of MPI may restrict the number of actual running processes from exceeding the number of MPI ranks
    requested.  When using Dask Nannies, the Nanny process is executed and runs in the background
    after forking a Worker process.  Hence, one Worker process will exist for each Nanny process.
    Some MPI installations will kill any forked process, and you will see many errors arising from
    the Worker processes being killed.  If this happens, disable the use of Nannies with the
-   ``--no-nanny`` option to ``dask-mpi``.
+   ``--worker-class distributed.Worker`` option to ``dask-mpi``.
 
 For more details on how to use the ``dask-mpi`` command, see the :ref:`cli`.
