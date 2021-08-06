@@ -1,6 +1,7 @@
 from distributed import Client
-from dask_mpi import initialize, send_close_signal
 from mpi4py.MPI import COMM_WORLD as world
+
+from dask_mpi import initialize, send_close_signal
 
 # Split our MPI world into two pieces, one consisting just of
 # the old rank 3 process and the other with everything else
