@@ -1,10 +1,5 @@
-from time import sleep
-
 from distributed import Client
-from distributed.metrics import time
-
 from dask_mpi import initialize, send_close_signal
-
 from mpi4py.MPI import COMM_WORLD as world
 
 # Split our MPI world into two pieces, one consisting just of
@@ -21,8 +16,6 @@ if world.rank != 3:
             c.submit(lambda x: x + 1, 10).result() == 11
             c.submit(lambda x: x + 1, 20).result() == 21
         send_close_signal()
-
-
 
 # check that our original comm is intact
 world.Barrier()
