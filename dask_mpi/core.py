@@ -73,6 +73,7 @@ def initialize(
     """
     if comm is None:
         from mpi4py import MPI
+
         comm = MPI.COMM_WORLD
 
     rank = comm.Get_rank()
@@ -148,6 +149,7 @@ def send_close_signal():
     You only need to call this manually when using exit=False
     in initialize.
     """
+
     async def stop(dask_scheduler):
         await dask_scheduler.close()
         await gen.sleep(0.1)
