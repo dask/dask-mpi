@@ -1,46 +1,56 @@
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import, division, print_function
 
+import json
 import os
-
+import subprocess
+import tempfile
 from time import sleep
 
 import pytest
-
-pytest.importorskip("mpi4py")
-
 import requests
-
-import json
-
-import tempfile
-
-import subprocess
-
 from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
-from distributed.utils import tmpfile
-from distributed.utils_test import popen
+from distributed.utils import import_term, tmpfile
 from distributed.utils_test import loop  # noqa: F401
+from distributed.utils_test import popen
 
+pytest.importorskip("mpi4py")
 
 FNULL = open(os.devnull, "w")  # hide output of subprocess
 
 
-@pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
-def test_basic(loop, nanny, mpirun):
+@pytest.mark.parametrize(
+    "worker_class",
+    ["distributed.Worker", "distributed.Nanny", "dask_cuda.CUDAWorker"],
+)
+def test_basic(loop, worker_class, mpirun):
+    try:
+        import_term(worker_class)
+    except (ImportError, AttributeError):
+        pytest.skip(
+            "Cannot import {}, perhaps it is not installed".format(worker_class)
+        )
     with tmpfile(extension="json") as fn:
 
-        cmd = mpirun + ["-np", "4", "dask-mpi", "--scheduler-file", fn, nanny]
+        cmd = mpirun + [
+            "-np",
+            "4",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--worker-class",
+            worker_class,
+        ]
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
                 start = time()
-                while len(c.scheduler_info()["workers"]) != 3:
+                while len(c.scheduler_info()["workers"]) < 3:
                     assert time() < start + 10
                     sleep(0.2)
 
-                assert c.submit(lambda x: x + 1, 10, workers=1).result() == 11
+                assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
 def test_no_scheduler(loop, mpirun):

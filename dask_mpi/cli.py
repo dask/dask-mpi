@@ -1,10 +1,10 @@
-import click
-
 import asyncio
+import json
 
-from dask.distributed import Scheduler, Worker, Nanny
+import click
+from dask.distributed import Scheduler, Worker
 from distributed.cli.utils import check_python_3
-
+from distributed.utils import import_term
 from mpi4py import MPI
 
 
@@ -55,7 +55,19 @@ from mpi4py import MPI
 @click.option(
     "--nanny/--no-nanny",
     default=True,
-    help="Start workers in nanny process for management",
+    help="Start workers in nanny process for management (deprecated use --worker-class instead)",
+)
+@click.option(
+    "--worker-class",
+    type=str,
+    default="distributed.Nanny",
+    help="Class to use when creating workers",
+)
+@click.option(
+    "--worker-options",
+    type=str,
+    default=None,
+    help="JSON serialised dict of options to pass to workers",
 )
 @click.option(
     "--dashboard-address",
@@ -79,6 +91,8 @@ def main(
     scheduler,
     dashboard_address,
     nanny,
+    worker_class,
+    worker_options,
     scheduler_port,
     protocol,
     name
@@ -86,6 +100,11 @@ def main(
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+
+    try:
+        worker_options = json.loads(worker_options)
+    except TypeError:
+        worker_options = {}
 
     if rank == 0 and scheduler:
 
@@ -105,17 +124,25 @@ def main(
         comm.Barrier()
 
         async def run_worker():
-            WorkerType = Nanny if nanny else Worker
-            async with WorkerType(
-                scheduler_ip=scheduler_address,
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_directory=local_directory,
-                name=f"{name}-{rank}",
-                scheduler_file=scheduler_file,
-            ) as worker:
+
+            WorkerType = import_term(worker_class)
+            if not nanny:
+                raise DeprecationWarning(
+                    "Option --no-nanny is deprectaed, use --worker-class instead"
+                )
+                WorkerType = Worker
+            opts = {
+                "scheduler_ip": scheduler_address,
+                "interface": interface,
+                "protocol": protocol,
+                "nthreads": nthreads,
+                "memory_limit": memory_limit,
+                "local_directory": local_directory,
+                "name": f"{name}-{rank}",
+                "scheduler_file": scheduler_file,
+                **worker_options,
+            }
+            async with WorkerType(**opts) as worker:
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())

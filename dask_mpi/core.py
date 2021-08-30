@@ -3,8 +3,8 @@ import atexit
 import sys
 
 import dask
-from dask.distributed import Client, Scheduler, Worker, Nanny
-
+from dask.distributed import Client, Nanny, Scheduler
+from distributed.utils import import_term
 from tornado import gen
 from tornado.ioloop import IOLoop
 
@@ -18,6 +18,8 @@ def initialize(
     dashboard=True,
     dashboard_address=":8787",
     protocol=None,
+    worker_class="distributed.Worker",
+    worker_options=None,
 ):
     """
     Initialize a Dask cluster using mpi4py
@@ -38,15 +40,17 @@ def initialize(
         Number of bytes before spilling data to disk.  This can be an
         integer (nbytes), float (fraction of total memory), or 'auto'.
     nanny : bool
-        Start workers in nanny process for management
-    bokeh : bool
+        Start workers in nanny process for management (deprecated, use worker_class instead)
+    dashboard : bool
         Enable Bokeh visual diagnostics
-    bokeh_port : int
+    dashboard_address : str
         Bokeh port for visual diagnostics
-    bokeh_prefix : str
-        Prefix for the bokeh app
-    bokeh_worker_port : int
-        Worker's Bokeh port for visual diagnostics
+    protocol : str
+        Protocol like 'inproc' or 'tcp'
+    worker_class : str
+        Class to use when creating workers
+    worker_options : dict
+        Options to pass to workers
     """
     from mpi4py import MPI
 
@@ -54,12 +58,16 @@ def initialize(
     rank = comm.Get_rank()
     loop = IOLoop.current()
 
+    if not worker_options:
+        worker_options = {}
+
     if rank == 0:
 
         async def run_scheduler():
             async with Scheduler(
                 interface=interface,
                 protocol=protocol,
+                dashboard=dashboard,
                 dashboard_address=dashboard_address,
             ) as scheduler:
                 comm.bcast(scheduler.address, root=0)
@@ -79,15 +87,22 @@ def initialize(
     else:
 
         async def run_worker():
-            WorkerType = Nanny if nanny else Worker
-            async with WorkerType(
-                interface=interface,
-                protocol=protocol,
-                nthreads=nthreads,
-                memory_limit=memory_limit,
-                local_dir=local_directory,
-                name=rank,
-            ) as worker:
+            WorkerType = import_term(worker_class)
+            if nanny:
+                raise DeprecationWarning(
+                    "Option nanny=True is deprectaed, use worker_class='distributed.Nanny' instead"
+                )
+                WorkerType = Nanny
+            opts = {
+                "interface": interface,
+                "protocol": protocol,
+                "nthreads": nthreads,
+                "memory_limit": memory_limit,
+                "local_directory": local_directory,
+                "name": rank,
+                **worker_options,
+            }
+            async with WorkerType(**opts) as worker:
                 await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())

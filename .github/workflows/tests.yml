@@ -1,0 +1,64 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+  workflow_dispatch: # allows you to trigger manually
+
+jobs:
+  build:
+    name: python-${{ matrix.python }}-${{ matrix.mpi }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.6', '3.7', '3.8']
+        mpi: ['mpich', 'openmpi']
+    env:
+      PYTHON: ${{ matrix.python }}
+      MPI: ${{ matrix.mpi }}
+      ENV_FILE: ci/env-${{ matrix.mpi }}.yml
+      OMPI_MCA_rmaps_base_oversubscribe: '1'
+      OMPI_ALLOW_RUN_AS_ROOT: '1'
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: '1'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          # Increase this value to reset cache if ci/environment.yml has not changed
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles( env.ENV_FILE ) }}
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: dask-mpi-dev # Defined in ci/env-mpi.yml
+          auto-update-conda: false
+          python-version: ${{ matrix.python }}
+          environment-file: ${{ env.ENV_FILE }}
+          use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
+      - name: Install package
+        run: python -m pip install --no-deps -e .
+      - name: Check Installation
+        run: |
+          conda list
+          pip list
+      - name: Run Tests
+        run: pytest --junitxml=test-reports/junit.xml --cov=./ dask_mpi/tests/ --verbose
+      - name: Upload code coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          env_vars: PYTHON,MPI
+          name: codecov-umbrella
+          fail_ci_if_error: false

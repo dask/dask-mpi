@@ -121,3 +121,5 @@ purge.lock
 
 # DevContainer extension files
 .devcontainer/
+
+test-reports/

@@ -3,11 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.6
-  - pip
-  - dask>=2.2
-  - openmpi
-  - mpi4py
+  - dask>=2.19
+  - distributed>=2.19
+  - mpich
+  - mpi4py>=3.0.3
   - pytest
   - pytest-icdiff
   - pytest-cov
@@ -15,5 +14,3 @@ dependencies:
   - requests
   - codecov
   - jupyter-server-proxy
-  - flake8
-  - black

@@ -75,6 +75,7 @@ during your computation, or for interactive use.
    install
    batch
    interactive
+   gpu
 
 .. toctree::
    :maxdepth: 1

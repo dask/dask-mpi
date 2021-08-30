@@ -29,3 +29,13 @@ Test using ``pytest``::
 
    py.test dask_mpi --verbose
 
+Build docs
+----------
+
+To build docs site after cloning and installing from sources use::
+
+    cd dask-mpi/docs
+    make html
+
+Output will be placed in ``build`` directory.
+Required dependencies for building docs can be found in ``dask-mpi/docs/environment.yml``.
