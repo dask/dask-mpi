@@ -23,7 +23,7 @@ from .core import MPIRunner
 @click.option(
     "--protocol", type=str, default="tcp", help="Network protocol to use like TCP"
 )
-@click.option("--nthreads", type=int, default=0, help="Number of threads per worker.")
+@click.option("--nthreads", type=int, default=1, help="Number of threads per worker.")
 @click.option(
     "--memory-limit",
     default="auto",
@@ -33,7 +33,7 @@ from .core import MPIRunner
     "or 'auto'",
 )
 @click.option(
-    "--local-directory", default="", type=str, help="Directory to place worker files"
+    "--local-directory", default=None, type=str, help="Directory to place worker files"
 )
 @click.option(
     "--scheduler/--no-scheduler",
@@ -46,7 +46,19 @@ from .core import MPIRunner
 @click.option(
     "--nanny/--no-nanny",
     default=True,
-    help="Start workers in nanny process for management",
+    help="Start workers in nanny process for management (deprecated use --worker-class instead)",
+)
+@click.option(
+    "--worker-class",
+    type=str,
+    default="distributed.Nanny",
+    help="Class to use when creating workers",
+)
+@click.option(
+    "--worker-options",
+    type=str,
+    default=None,
+    help="JSON serialised dict of options to pass to workers",
 )
 @click.option(
     "--dashboard-address",
@@ -63,6 +75,8 @@ def main(
     scheduler,
     dashboard_address,
     nanny,
+    worker_class,
+    worker_options,
     scheduler_port,
     protocol,
 ):

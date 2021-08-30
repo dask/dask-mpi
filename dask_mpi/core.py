@@ -55,6 +55,8 @@ def initialize(
     dashboard=True,
     dashboard_address=":8787",
     protocol=None,
+    worker_class="distributed.Worker",
+    worker_options=None,
 ):
     """
     Initialize a Dask cluster using mpi4py
@@ -75,14 +77,19 @@ def initialize(
         Number of bytes before spilling data to disk.  This can be an
         integer (nbytes), float (fraction of total memory), or 'auto'.
     nanny : bool
-        Start workers in nanny process for management
+        Start workers in nanny process for management (deprecated, use worker_class instead)
     dashboard : bool
         Enable Bokeh visual diagnostics
     dashboard_address : str
         Bokeh port for visual diagnostics
     protocol : str
         Protocol like 'inproc' or 'tcp'
+    worker_class : str
+        Class to use when creating workers
+    worker_options : dict
+        Options to pass to workers
     """
+
     scheduler_options = {
         "interface": interface,
         "protocol": protocol,
