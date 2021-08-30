@@ -9,11 +9,7 @@ from mpi4py import MPI
 
 
 @click.command()
-@click.argument("scheduler_address",
-    type=str,
-    required=False
-)
-
+@click.argument("scheduler_address", type=str, required=False)
 @click.option(
     "--scheduler-file",
     type=str,
