@@ -93,7 +93,7 @@ def main(
     worker_options,
     scheduler_port,
     protocol,
-    name
+    name,
 ):
 
     comm = MPI.COMM_WORLD
