@@ -11,7 +11,7 @@ import requests
 from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
-from distributed.utils import import_term, tmpfile
+from distributed.utils import tmpfile
 from distributed.utils_test import loop  # noqa: F401
 from distributed.utils_test import popen
 
@@ -20,8 +20,11 @@ pytest.importorskip("mpi4py")
 FNULL = open(os.devnull, "w")  # hide output of subprocess
 
 
-@pytest.mark.parametrize("nanny", ["--no-nanny", "--nanny"])
-def test_basic(loop, nanny, mpirun):
+@pytest.mark.parametrize(
+    "worker_class",
+    ["distributed.Worker", "distributed.Nanny", "dask_cuda.CUDAWorker"],
+)
+def test_basic(loop, worker_class, mpirun):
     with tmpfile(extension="json") as fn:
 
         cmd = mpirun + [
