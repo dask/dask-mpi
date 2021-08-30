@@ -37,7 +37,7 @@ from mpi4py import MPI
     "or 'auto'",
 )
 @click.option(
-    "--local-directory", default="", type=str, help="Directory to place worker files"
+    "--local-directory", default=None, type=str, help="Directory to place worker files"
 )
 @click.option(
     "--scheduler/--no-scheduler",
