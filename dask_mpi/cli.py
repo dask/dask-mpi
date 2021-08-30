@@ -28,7 +28,9 @@ from mpi4py import MPI
 @click.option(
     "--protocol", type=str, default=None, help="Network protocol to use like TCP"
 )
-@click.option("--nthreads", type=int, default=None, help="Number of threads per worker.")
+@click.option(
+    "--nthreads", type=int, default=None, help="Number of threads per worker."
+)
 @click.option(
     "--memory-limit",
     default="auto",
