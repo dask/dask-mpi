@@ -84,7 +84,6 @@ def test_no_scheduler(loop, mpirun):
                         sleep(0.2)
 
 
-@pytest.mark.skip(reason="Should we explicilty expose --worker-port?")
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
 def test_non_default_ports(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
@@ -98,31 +97,13 @@ def test_non_default_ports(loop, nanny, mpirun):
             nanny,
             "--scheduler-port",
             "56723",
-            "--worker-port",
-            "58464",
-            "--nanny-port",
-            "50164",
         ]
 
         with popen(cmd):
             with Client(scheduler_file=fn) as c:
-
-                start = time()
-                while len(c.scheduler_info()["workers"]) != 1:
-                    assert time() < start + 10
-                    sleep(0.2)
-
                 sched_info = c.scheduler_info()
-                sched_host, sched_port = get_address_host_port(sched_info["address"])
+                _, sched_port = get_address_host_port(sched_info["address"])
                 assert sched_port == 56723
-                for worker_addr, worker_info in sched_info["workers"].items():
-                    worker_host, worker_port = get_address_host_port(worker_addr)
-                    assert worker_port == 58464
-                    if nanny == "--nanny":
-                        _, nanny_port = get_address_host_port(worker_info["nanny"])
-                        assert nanny_port == 50164
-
-                assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
 def check_port_okay(port):
