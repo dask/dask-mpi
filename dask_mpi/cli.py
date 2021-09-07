@@ -131,7 +131,6 @@ def main(
                 )
                 WorkerType = Worker
             opts = {
-                "scheduler_ip": scheduler_address,
                 "interface": interface,
                 "protocol": protocol,
                 "nthreads": nthreads,
@@ -141,6 +140,8 @@ def main(
                 "scheduler_file": scheduler_file,
                 **worker_options,
             }
+            if scheduler_address:
+                opts["scheduler_ip"] = scheduler_address
             async with WorkerType(**opts) as worker:
                 await worker.finished()
 
