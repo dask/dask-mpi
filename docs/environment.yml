@@ -1,6 +1,6 @@
 name: dask-mpi-docs
 channels:
-  - conda-forge 
+  - conda-forge
   - nodefaults
 dependencies:
   - dask>=2.19
@@ -12,6 +12,6 @@ dependencies:
   - pygments
   - pip
   - pip:
-    - dask_sphinx_theme
-    - numpydoc
-    - sphinx-click
+      - dask_sphinx_theme>=2
+      - numpydoc
+      - sphinx-click
