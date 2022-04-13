@@ -3,7 +3,7 @@ import atexit
 import sys
 
 import dask
-from dask.distributed import Client, Nanny, Scheduler
+from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
 from tornado import gen
 from tornado.ioloop import IOLoop

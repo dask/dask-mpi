@@ -2,8 +2,7 @@ import asyncio
 import json
 
 import click
-from dask.distributed import Scheduler, Worker
-from distributed.cli.utils import check_python_3
+from distributed import Scheduler, Worker
 from distributed.utils import import_term
 from mpi4py import MPI
 
@@ -148,10 +147,5 @@ def main(
         asyncio.get_event_loop().run_until_complete(run_worker())
 
 
-def go():
-    check_python_3()
-    main()
-
-
 if __name__ == "__main__":
-    go()
+    main()
