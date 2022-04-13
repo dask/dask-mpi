@@ -52,7 +52,7 @@ setup(
     long_description=long_description,
     entry_points="""
             [console_scripts]
-            dask-mpi=dask_mpi.cli:go
+            dask-mpi=dask_mpi.cli:main
             """,
     zip_safe=False,
 )
