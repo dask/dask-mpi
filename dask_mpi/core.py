@@ -5,7 +5,6 @@ import sys
 import dask
 from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
-from tornado.ioloop import IOLoop
 
 
 def initialize(
@@ -76,7 +75,6 @@ def initialize(
         comm = MPI.COMM_WORLD
 
     rank = comm.Get_rank()
-    loop = IOLoop.current()
 
     if not worker_options:
         worker_options = {}
