@@ -1,7 +1,7 @@
 from distributed import Client
 from mpi4py.MPI import COMM_WORLD as world
 
-from dask_mpi import initialize, send_close_signal
+from dask_mpi import finalize, initialize
 
 # Split our MPI world into two pieces, one consisting just of
 # the old rank 3 process and the other with everything else
@@ -16,7 +16,7 @@ if world.rank != 3:
         with Client() as c:
             c.submit(lambda x: x + 1, 10).result() == 11
             c.submit(lambda x: x + 1, 20).result() == 21
-        send_close_signal()
+        finalize()
 
 # check that our original comm is intact
 world.Barrier()
