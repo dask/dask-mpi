@@ -105,7 +105,7 @@ def initialize(
 
     if rank == 1:
         if exit:
-            atexit.register(send_close_signal)
+            atexit.register(shutdown_cluster)
         return True
     else:
 
@@ -135,7 +135,7 @@ def initialize(
             return False
 
 
-def send_close_signal():
+def shutdown_cluster():
     """
     The client can call this function to explicitly stop
     the event loop.
