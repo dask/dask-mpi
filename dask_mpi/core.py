@@ -5,8 +5,6 @@ import sys
 import dask
 from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
-from tornado import gen
-from tornado.ioloop import IOLoop
 
 
 def initialize(
@@ -77,7 +75,6 @@ def initialize(
         comm = MPI.COMM_WORLD
 
     rank = comm.Get_rank()
-    loop = IOLoop.current()
 
     if not worker_options:
         worker_options = {}
@@ -108,7 +105,7 @@ def initialize(
 
     if rank == 1:
         if exit:
-            atexit.register(send_close_signal)
+            atexit.register(finalize)
         return True
     else:
 
@@ -138,7 +135,7 @@ def initialize(
             return False
 
 
-def send_close_signal():
+def finalize():
     """
     The client can call this function to explicitly stop
     the event loop.
@@ -150,11 +147,5 @@ def send_close_signal():
     in initialize.
     """
 
-    async def stop(dask_scheduler):
-        await dask_scheduler.close()
-        await gen.sleep(0.1)
-        local_loop = dask_scheduler.loop
-        local_loop.add_callback(local_loop.stop)
-
     with Client() as c:
-        c.run_on_scheduler(stop, wait=False)
+        c.shutdown()
