@@ -105,7 +105,7 @@ def initialize(
 
     if rank == 1:
         if exit:
-            atexit.register(finalize)
+            atexit.register(send_close_signal)
         return True
     else:
 
@@ -135,7 +135,7 @@ def initialize(
             return False
 
 
-def finalize():
+def send_close_signal():
     """
     The client can call this function to explicitly stop
     the event loop.
