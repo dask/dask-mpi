@@ -12,6 +12,6 @@ dependencies:
   - pygments
   - pip
   - pip:
-      - dask_sphinx_theme>=2
+      - dask-sphinx-theme>=3.0.0
       - numpydoc
       - sphinx-click
