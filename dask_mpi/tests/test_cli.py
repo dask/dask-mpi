@@ -12,8 +12,8 @@ from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
 from distributed.utils import import_term, tmpfile
-from distributed.utils_test import loop, loop_in_thread, cleanup  # noqa: F401
-from distributed.utils_test import popen
+from distributed.utils_test import (cleanup, loop,  # noqa: F401
+                                    loop_in_thread, popen)
 
 pytest.importorskip("mpi4py")
 
