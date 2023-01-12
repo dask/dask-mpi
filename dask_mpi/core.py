@@ -69,8 +69,10 @@ def initialize(
         Only returned if exit=False. Inidcates whether this rank should continue
         to run client code (True), or if it acts as a scheduler or worker (False).
     """
-    assert comm is not None, "MPI Comm World needs to be created before import distributed."
-    
+    assert (
+        comm is not None
+    ), "MPI Comm World needs to be created before import distributed."
+
     rank = comm.Get_rank()
 
     if not worker_options:
