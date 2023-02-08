@@ -94,7 +94,6 @@ def main(
     protocol,
     name,
 ):
-
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
 
@@ -122,7 +121,6 @@ def main(
         comm.Barrier()
 
         async def run_worker():
-
             WorkerType = import_term(worker_class)
             if not nanny:
                 raise DeprecationWarning(

@@ -8,7 +8,6 @@ from dask_mpi import initialize
 initialize()
 
 with Client() as c:
-
     start = time()
     while len(c.scheduler_info()["workers"]) != 2:
         assert time() < start + 10
