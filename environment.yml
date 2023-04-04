@@ -3,4 +3,3 @@ dependencies:
   - dask>=2.19
   - distributed>=2.19
   - mpi4py>=3.0.3
-  - jupyter-server-proxy
