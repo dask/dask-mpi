@@ -47,11 +47,6 @@ setup(
     license="BSD 3-Clause",
     include_package_data=True,
     install_requires=install_requires,
-    extras_require={
-        "jupyter-server-proxy": [
-            "jupyter-server-proxy",
-        ],
-    },
     python_requires=">=3.6",
     packages=["dask_mpi"],
     long_description=long_description,
