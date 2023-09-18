@@ -80,7 +80,7 @@ def initialize(
     if world_size < 3:
         raise WorldTooSmallException(
             f"Not enough MPI ranks to start cluster, found {world_size}, "
-            "needs 3 or more, one for the scheduler, client and a worker."
+            "needs at least 3, one each for the scheduler, client and a worker."
         )
 
     rank = comm.Get_rank()
