@@ -6,6 +6,8 @@ import dask
 from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
 
+from .exceptions import WorldTooSmallException
+
 
 def initialize(
     interface=None,
@@ -73,6 +75,13 @@ def initialize(
         from mpi4py import MPI
 
         comm = MPI.COMM_WORLD
+
+    world_size = comm.Get_size()
+    if world_size < 3:
+        raise WorldTooSmallException(
+            f"Not enough MPI ranks to start cluster, found {world_size}, "
+            "needs 3 or more for the scheduler, client and at least 1 worker."
+        )
 
     rank = comm.Get_rank()
 
