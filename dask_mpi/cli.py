@@ -102,7 +102,7 @@ def main(
     if scheduler and world_size < 2:
         raise WorldTooSmallException(
             f"Not enough MPI ranks to start cluster, found {world_size}, "
-            "needs at least 2 for the scheduler and at least 1 worker."
+            "needs at least 2, one for the scheduler and a worker."
         )
 
     rank = comm.Get_rank()
