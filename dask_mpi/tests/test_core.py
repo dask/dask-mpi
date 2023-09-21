@@ -18,3 +18,15 @@ def test_basic(mpirun):
 
     p.communicate()
     assert p.returncode == 0
+
+
+def test_small_world(mpirun):
+    script_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "core_basic.py"
+    )
+
+    # Set too few processes to start cluster
+    p = subprocess.Popen(mpirun + ["-np", "1", sys.executable, script_file])
+
+    p.communicate()
+    assert p.returncode != 0

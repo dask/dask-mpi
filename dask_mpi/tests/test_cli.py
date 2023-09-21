@@ -51,6 +51,24 @@ def test_basic(loop, worker_class, mpirun):
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
+def test_small_world(mpirun):
+    with tmpfile(extension="json") as fn:
+        # Set too few processes to start cluster
+        p = subprocess.Popen(
+            mpirun
+            + [
+                "-np",
+                "1",
+                "dask-mpi",
+                "--scheduler-file",
+                fn,
+            ]
+        )
+
+        p.communicate()
+        assert p.returncode != 0
+
+
 def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
         cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
