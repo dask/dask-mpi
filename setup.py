@@ -9,8 +9,8 @@ import versioneer
 def environment_dependencies(obj, dependencies=None):
     if dependencies is None:
         dependencies = []
-    # if isinstance(obj, string_types):
-    #     dependencies.append(obj.replace('=', '=='))
+    if isinstance(obj, str):
+        dependencies.append(obj)
     elif isinstance(obj, dict):
         if "dependencies" in obj:
             environment_dependencies(obj["dependencies"], dependencies=dependencies)
