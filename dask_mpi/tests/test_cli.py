@@ -90,6 +90,27 @@ def test_small_world(mpirun):
         assert p.returncode != 0
 
 
+def test_inclusive_small_world(mpirun):
+    with tmpfile(extension="json") as fn:
+        cmd = mpirun + [
+            "-np",
+            "1",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--inclusive-workers",
+        ]
+
+        with popen(cmd):
+            with Client(scheduler_file=fn) as client:
+                start = time()
+                while len(client.scheduler_info()["workers"]) < 1:
+                    assert time() < start + 10
+                    sleep(0.1)
+
+                assert client.submit(lambda x: x + 1, 10).result() == 11
+
+
 def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
         cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
