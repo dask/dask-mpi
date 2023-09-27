@@ -51,6 +51,27 @@ def test_basic(loop, worker_class, mpirun):
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
+def test_inclusive_workers(loop, mpirun):
+    with tmpfile(extension="json") as fn:
+        cmd = mpirun + [
+            "-np",
+            "4",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--inclusive-workers",
+        ]
+
+        with popen(cmd):
+            with Client(scheduler_file=fn) as client:
+                start = time()
+                while len(client.scheduler_info()["workers"]) < 4:
+                    assert time() < start + 10
+                    sleep(0.1)
+
+                assert client.submit(lambda x: x + 1, 10).result() == 11
+
+
 def test_small_world(mpirun):
     with tmpfile(extension="json") as fn:
         # Set too few processes to start cluster
@@ -96,6 +117,35 @@ def test_no_scheduler(loop, mpirun):
                     while len(c.scheduler_info()["workers"]) != 2:
                         assert time() < start + 10
                         sleep(0.2)
+
+
+def test_scheduler_rank(loop, mpirun):
+    with tmpfile(extension="json") as fn:
+        cmd = mpirun + [
+            "-np",
+            "2",
+            "dask-mpi",
+            "--scheduler-file",
+            fn,
+            "--exclusive-workers",
+            "--scheduler-rank",
+            "1",
+        ]
+
+        with popen(cmd, stdin=FNULL):
+            with Client(scheduler_file=fn) as client:
+                start = time()
+                while len(client.scheduler_info()["workers"]) < 1:
+                    assert time() < start + 10
+                    sleep(0.2)
+
+                worker_infos = client.scheduler_info()["workers"]
+                assert len(worker_infos) == 1
+
+                worker_info = next(iter(worker_infos.values()))
+                assert worker_info["name"].rsplit("-")[-1] == "0"
+
+                assert client.submit(lambda x: x + 1, 10).result() == 11
 
 
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
@@ -148,23 +198,6 @@ def test_dashboard(loop, mpirun):
 
         with pytest.raises(Exception):
             requests.get("http://localhost:59583/status/")
-
-
-@pytest.mark.skip(reason="Should we expose this option?")
-def test_bokeh_worker(loop, mpirun):
-    with tmpfile(extension="json") as fn:
-        cmd = mpirun + [
-            "-np",
-            "2",
-            "dask-mpi",
-            "--scheduler-file",
-            fn,
-            "--bokeh-worker-port",
-            "59584",
-        ]
-
-        with popen(cmd, stdin=FNULL):
-            check_port_okay(59584)
 
 
 def tmpfile_static(extension="", dir=None):
