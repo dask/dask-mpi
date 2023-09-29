@@ -115,11 +115,11 @@ def main(
     comm = MPI.COMM_WORLD
 
     world_size = comm.Get_size()
-    if scheduler and exclusive_workers and world_size < 2:
+    min_world_size = 1 + scheduler * max(scheduler_rank, exclusive_workers)
+    if world_size < min_world_size:
         raise WorldTooSmallException(
-            "Not enough MPI ranks to start cluster with exclusive workers, "
-            f"found {world_size} MPI ranks, needs at least 2, "
-            "one each for the scheduler and a worker."
+            f"Not enough MPI ranks to start cluster with exclusive_workers={exclusive_workers} and "
+            f"scheduler_rank={scheduler_rank}, found {world_size} MPI ranks but needs {min_world_size}."
         )
 
     rank = comm.Get_rank()
