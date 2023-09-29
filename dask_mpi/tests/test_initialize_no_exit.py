@@ -11,7 +11,7 @@ pytest.importorskip("mpi4py")
 
 def test_no_exit(mpirun):
     script_file = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "core_no_exit.py"
+        os.path.dirname(os.path.realpath(__file__)), "initialize_no_exit.py"
     )
 
     p = subprocess.Popen(mpirun + ["-np", "4", sys.executable, script_file])
