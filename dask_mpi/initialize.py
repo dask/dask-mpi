@@ -121,10 +121,10 @@ def initialize(
         async def run_worker():
             WorkerType = import_term(worker_class)
             if nanny:
+                WorkerType = Nanny
                 raise DeprecationWarning(
                     "Option nanny=True is deprectaed, use worker_class='distributed.Nanny' instead"
                 )
-                WorkerType = Nanny
             opts = {
                 "interface": interface,
                 "protocol": protocol,
