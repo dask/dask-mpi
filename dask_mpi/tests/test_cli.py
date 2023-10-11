@@ -8,10 +8,11 @@ from time import sleep
 
 import pytest
 import requests
+from dask.utils import tmpfile
 from distributed import Client
 from distributed.comm.addressing import get_address_host_port
 from distributed.metrics import time
-from distributed.utils import import_term, tmpfile
+from distributed.utils import import_term
 from distributed.utils_test import cleanup, loop, loop_in_thread, popen  # noqa: F401
 
 pytest.importorskip("mpi4py")
