@@ -1,4 +1,5 @@
 import asyncio
+import threading
 
 import dask
 from distributed import Nanny, Scheduler
@@ -75,12 +76,6 @@ def execute(
         Options to pass to workers
     comm: mpi4py.MPI.Intracomm
         Optional MPI communicator to use instead of COMM_WORLD
-
-    Returns
-    -------
-    ret : Any
-        If the MPI rank equals client_rank, then the return value of the executed function.
-        Otherwise, returns None.
     """
     if comm is None:
         from mpi4py import MPI
@@ -100,7 +95,14 @@ def execute(
     if not worker_options:
         worker_options = {}
 
-    async def run_worker():
+    async def run_client():
+        def wrapped_func(*args, **kwargs):
+            func(*args, **kwargs)
+            send_close_signal()
+
+        threading.Thread(target=wrapped_func, args=args, kwargs=kwargs).start()
+
+    async def run_worker(launch_client=False):
         WorkerType = import_term(worker_class)
         if nanny:
             WorkerType = Nanny
@@ -117,9 +119,12 @@ def execute(
             **worker_options,
         }
         async with WorkerType(**opts) as worker:
+            if launch_client:
+                asyncio.get_event_loop().create_task(run_client())
+
             await worker.finished()
 
-    async def run_scheduler(launch_worker=False):
+    async def run_scheduler(launch_worker=False, launch_client=False):
         async with Scheduler(
             interface=interface,
             protocol=protocol,
@@ -130,22 +135,30 @@ def execute(
             comm.Barrier()
 
             if launch_worker:
-                asyncio.create_task(run_worker())
+                asyncio.get_event_loop().create_task(run_worker(launch_client=launch_client))
+
+            elif launch_client:
+                asyncio.get_event_loop().create_task(run_client())
 
             await scheduler.finished()
 
-    if rank == scheduler_rank:
-        asyncio.get_event_loop().run_until_complete(run_scheduler())
+    launch_scheduler = rank == scheduler_rank
+    launch_client = rank == client_rank
+
+    if launch_scheduler:
+        run_coro = run_scheduler(
+            launch_worker=not exclusive_workers,
+            launch_client=launch_client,
+        )
 
     else:
         scheduler_address = comm.bcast(None, root=scheduler_rank)
         dask.config.set(scheduler_address=scheduler_address)
         comm.Barrier()
 
-        if rank == client_rank:
-            ret = func(*args, **kwargs)
-            send_close_signal()
-            return ret
-
+        if launch_client and exclusive_workers:
+            run_coro = run_client()
         else:
-            asyncio.get_event_loop().run_until_complete(run_worker())
+            run_coro = run_worker(launch_client=launch_client)
+
+    asyncio.get_event_loop().run_until_complete(run_coro)
