@@ -132,6 +132,7 @@ def main(
     async def run_worker():
         WorkerType = import_term(worker_class)
         if not nanny:
+            WorkerType = Worker
             raise DeprecationWarning(
                 "Option --no-nanny is deprectaed, use --worker-class instead"
             )
