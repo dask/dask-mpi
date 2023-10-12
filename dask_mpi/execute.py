@@ -136,7 +136,9 @@ def execute(
             comm.Barrier()
 
             if with_worker:
-                asyncio.get_event_loop().create_task(run_worker(with_client=with_client))
+                asyncio.get_event_loop().create_task(
+                    run_worker(with_client=with_client)
+                )
 
             elif with_client:
                 asyncio.get_event_loop().create_task(run_client())
