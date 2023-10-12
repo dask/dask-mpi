@@ -1,4 +1,4 @@
-from time import time, sleep
+from time import sleep, time
 
 from distributed import Client
 from mpi4py.MPI import COMM_WORLD as world
@@ -11,6 +11,7 @@ new_comm_assignment = 1 if world.rank == 3 else 0
 comm = world.Split(new_comm_assignment)
 
 if world.rank != 3:
+
     def client_code():
         with Client() as c:
             start = time()
