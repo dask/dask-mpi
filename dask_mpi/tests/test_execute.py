@@ -22,9 +22,9 @@ pytest.importorskip("mpi4py")
         (1, ["-c", "0", "-s", "0", "-x", "True"], 1),
     ],
 )
-def test_execute(mpisize, execute_args, retcode, mpirun):
+def test_basic(mpisize, execute_args, retcode, mpirun):
     script_file = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "execute_script.py"
+        os.path.dirname(os.path.realpath(__file__)), "execute_basic.py"
     )
 
     execute_args += ["-m", str(mpisize)]
@@ -34,3 +34,14 @@ def test_execute(mpisize, execute_args, retcode, mpirun):
 
     p.communicate()
     assert p.returncode == retcode
+
+
+def test_no_exit(mpirun):
+    script_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "execute_no_exit.py"
+    )
+
+    p = subprocess.Popen(mpirun + ["-np", "4", sys.executable, script_file])
+
+    p.communicate()
+    assert p.returncode == 0
