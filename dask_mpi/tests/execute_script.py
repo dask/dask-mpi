@@ -17,7 +17,9 @@ def client_func(m=4, c=1, s=0, x=True):
             assert time() < start + 10
             sleep(0.2)
 
-        actual_worker_ranks = set(v["name"] for k,v in c.scheduler_info()["workers"].items())
+        actual_worker_ranks = set(
+            v["name"] for k, v in c.scheduler_info()["workers"].items()
+        )
         assert actual_worker_ranks == worker_ranks
 
         for i in actual_worker_ranks:
@@ -32,7 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("-x", type=lambda v: v.lower() != "false", default=None)
     kwargs = vars(parser.parse_args())
 
-    execute_kwargs = {k:v for k,v in kwargs.items() if v is not None}
+    execute_kwargs = {k: v for k, v in kwargs.items() if v is not None}
     if "c" in execute_kwargs:
         execute_kwargs["client_rank"] = execute_kwargs["c"]
     if "s" in execute_kwargs:

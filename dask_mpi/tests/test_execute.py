@@ -20,7 +20,7 @@ pytest.importorskip("mpi4py")
         (2, ["-c", "0", "-s", "0", "-x", "False"], 0),
         (1, ["-c", "0", "-s", "0", "-x", "False"], 0),
         (1, ["-c", "0", "-s", "0", "-x", "True"], 1),
-    ]
+    ],
 )
 def test_execute(mpisize, execute_args, retcode, mpirun):
     script_file = os.path.join(
@@ -28,7 +28,9 @@ def test_execute(mpisize, execute_args, retcode, mpirun):
     )
 
     execute_args += ["-m", str(mpisize)]
-    p = subprocess.Popen(mpirun + ["-n", str(mpisize), sys.executable, script_file] + execute_args)
+    p = subprocess.Popen(
+        mpirun + ["-n", str(mpisize), sys.executable, script_file] + execute_args
+    )
 
     p.communicate()
     assert p.returncode == retcode
