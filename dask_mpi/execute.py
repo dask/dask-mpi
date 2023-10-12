@@ -102,7 +102,7 @@ def execute(
 
         threading.Thread(target=wrapped_func, args=args, kwargs=kwargs).start()
 
-    async def run_worker(launch_client=False):
+    async def run_worker(with_client=False):
         WorkerType = import_term(worker_class)
         if nanny:
             WorkerType = Nanny
@@ -119,25 +119,26 @@ def execute(
             **worker_options,
         }
         async with WorkerType(**opts) as worker:
-            if launch_client:
+            if with_client:
                 asyncio.get_event_loop().create_task(run_client())
 
             await worker.finished()
 
-    async def run_scheduler(launch_worker=False, launch_client=False):
+    async def run_scheduler(with_worker=False, with_client=False):
         async with Scheduler(
             interface=interface,
             protocol=protocol,
             dashboard=dashboard,
             dashboard_address=dashboard_address,
         ) as scheduler:
-            comm.bcast(scheduler.address, root=0)
+            dask.config.set(scheduler_address=scheduler.address)
+            comm.bcast(scheduler.address, root=scheduler_rank)
             comm.Barrier()
 
-            if launch_worker:
-                asyncio.get_event_loop().create_task(run_worker(launch_client=launch_client))
+            if with_worker:
+                asyncio.get_event_loop().create_task(run_worker(with_client=with_client))
 
-            elif launch_client:
+            elif with_client:
                 asyncio.get_event_loop().create_task(run_client())
 
             await scheduler.finished()
@@ -147,8 +148,8 @@ def execute(
 
     if launch_scheduler:
         run_coro = run_scheduler(
-            launch_worker=not exclusive_workers,
-            launch_client=launch_client,
+            with_worker=not exclusive_workers,
+            with_client=launch_client,
         )
 
     else:
@@ -159,6 +160,6 @@ def execute(
         if launch_client and exclusive_workers:
             run_coro = run_client()
         else:
-            run_coro = run_worker(launch_client=launch_client)
+            run_coro = run_worker(with_client=launch_client)
 
     asyncio.get_event_loop().run_until_complete(run_coro)
