@@ -72,10 +72,6 @@ def initialize(
         Only returned if exit=False. Inidcates whether this rank should continue
         to run client code (True), or if it acts as a scheduler or worker (False).
     """
-    raise DeprecationWarning(
-        "The initialize function is deprectaed, use the execute function instead"
-    )
-
     if comm is None:
         from mpi4py import MPI
 
