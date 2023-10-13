@@ -2,11 +2,10 @@ import asyncio
 import threading
 
 import dask
-from distributed import Nanny, Scheduler
+from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
 
 from .exceptions import WorldTooSmallException
-from .initialize import send_close_signal
 
 
 def execute(
@@ -193,3 +192,19 @@ def execute(
             run_coro = run_worker(with_client=with_client)
 
     asyncio.get_event_loop().run_until_complete(run_coro)
+
+
+def send_close_signal():
+    """
+    The client can call this function to explicitly stop
+    the event loop.
+
+    This is not needed in normal usage, where it is run
+    automatically when the client code exits python.
+
+    You only need to call this manually when using exit=False
+    in initialize.
+    """
+
+    with Client() as c:
+        c.shutdown()
