@@ -12,7 +12,7 @@ from .initialize import send_close_signal
 def execute(
     func,
     *args,
-    client_rank=1,
+    client_rank=None,
     scheduler_rank=0,
     interface=None,
     nthreads=1,
@@ -25,6 +25,7 @@ def execute(
     exclusive_workers=True,
     worker_class="distributed.Worker",
     worker_options=None,
+    worker_name=None,
     comm=None,
     **kwargs,
 ):
@@ -44,11 +45,12 @@ def execute(
     Parameters
     ----------
     func : callable
-        A function containing Dask client code to execute with a Dask cluster
+        A function containing Dask client code to execute with a Dask cluster.  If
+        func it not callable, then no client code will be executed.
     args : list
-        Arguments to func
+        Arguments to the client function
     client_rank : int
-        The MPI rank on which to run func
+        The MPI rank on which to run func.
     scheduler_rank : int
         The MPI rank on which to run the Dask scheduler
     interface : str
@@ -74,8 +76,13 @@ def execute(
         Class to use when creating workers
     worker_options : dict
         Options to pass to workers
-    comm: mpi4py.MPI.Intracomm
+    worker_name : str
+        Prefix for name given to workers.  If defined, each worker will be named
+        '{worker_name}-{rank}'.  Otherwise, the name of each worker is just '{rank}'.
+    comm : mpi4py.MPI.Intracomm
         Optional MPI communicator to use instead of COMM_WORLD
+    kwargs : dict
+        Keyword arguments to the client function
     """
     if comm is None:
         from mpi4py import MPI
@@ -115,7 +122,7 @@ def execute(
             "nthreads": nthreads,
             "memory_limit": memory_limit,
             "local_directory": local_directory,
-            "name": rank,
+            "name": rank if worker_name else f"{worker_name}-{rank}",
             **worker_options,
         }
         async with WorkerType(**opts) as worker:
@@ -145,13 +152,13 @@ def execute(
 
             await scheduler.finished()
 
-    launch_scheduler = rank == scheduler_rank
-    launch_client = rank == client_rank
+    with_scheduler = rank == scheduler_rank
+    with_client = callable(func) and (rank == client_rank)
 
-    if launch_scheduler:
+    if with_scheduler:
         run_coro = run_scheduler(
             with_worker=not exclusive_workers,
-            with_client=launch_client,
+            with_client=with_client,
         )
 
     else:
@@ -159,9 +166,9 @@ def execute(
         dask.config.set(scheduler_address=scheduler_address)
         comm.Barrier()
 
-        if launch_client and exclusive_workers:
+        if with_client and exclusive_workers:
             run_coro = run_client()
         else:
-            run_coro = run_worker(with_client=launch_client)
+            run_coro = run_worker(with_client=with_client)
 
     asyncio.get_event_loop().run_until_complete(run_coro)
