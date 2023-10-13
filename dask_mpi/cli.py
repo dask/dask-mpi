@@ -97,19 +97,19 @@ from .exceptions import WorldTooSmallException
 def main(
     scheduler_address,
     scheduler_file,
+    scheduler_port,
     scheduler_rank,
     interface,
+    protocol,
     nthreads,
-    local_directory,
     memory_limit,
+    local_directory,
     scheduler,
-    dashboard_address,
     nanny,
     exclusive_workers,
     worker_class,
     worker_options,
-    scheduler_port,
-    protocol,
+    dashboard_address,
     name,
 ):
     comm = MPI.COMM_WORLD
