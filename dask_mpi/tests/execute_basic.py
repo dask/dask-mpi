@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+import sys
 from time import sleep
 
 from distributed import Client
@@ -7,7 +7,7 @@ from distributed.metrics import time
 from dask_mpi import execute
 
 
-def client_func(m=4, c=1, s=0, x=True):
+def client_func(m, c, s, x):
     xranks = {c, s} if x else set()
     worker_ranks = set(i for i in range(m) if i not in xranks)
 
@@ -27,19 +27,14 @@ def client_func(m=4, c=1, s=0, x=True):
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("-m", type=int, default=None)
-    parser.add_argument("-c", type=int, default=None)
-    parser.add_argument("-s", type=int, default=None)
-    parser.add_argument("-x", type=lambda v: v.lower() != "false", default=None)
-    kwargs = vars(parser.parse_args())
+    vmap = {"True": True, "False": False, "None": None}
+    int_or_bool = lambda s: vmap[s] if s in vmap else int(s)
+    args = [int_or_bool(i) for i in sys.argv[1:]]
 
-    execute_kwargs = {k: v for k, v in kwargs.items() if v is not None}
-    if "c" in execute_kwargs:
-        execute_kwargs["client_rank"] = execute_kwargs["c"]
-    if "s" in execute_kwargs:
-        execute_kwargs["scheduler_rank"] = execute_kwargs["s"]
-    if "x" in execute_kwargs:
-        execute_kwargs["exclusive_workers"] = execute_kwargs["x"]
-
-    execute(client_func, **execute_kwargs)
+    execute(
+        client_function=client_func,
+        client_args=args,
+        client_rank=args[1],
+        scheduler_rank=args[2],
+        exclusive_workers=args[3],
+    )

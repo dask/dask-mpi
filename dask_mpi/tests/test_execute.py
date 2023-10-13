@@ -10,26 +10,26 @@ pytest.importorskip("mpi4py")
 
 
 @pytest.mark.parametrize(
-    "mpisize,execute_args,retcode",
+    "mpisize,crank,srank,xworkers,retcode",
     [
-        (4, [], 0),
-        (1, [], 1),  # Set too few processes to start cluster
-        (4, ["-c", "2", "-s", "3"], 0),
-        (5, ["-s", "3"], 0),
-        (3, ["-c", "2", "-s", "2"], 0),
-        (2, ["-c", "0", "-s", "0", "-x", "False"], 0),
-        (1, ["-c", "0", "-s", "0", "-x", "False"], 0),
-        (1, ["-c", "0", "-s", "0", "-x", "True"], 1),
+        (4, 1, 0, True, 0),  # DEFAULTS
+        (1, 1, 0, True, 1),  # Set too few processes to start cluster
+        (4, 2, 3, True, 0),
+        (5, 1, 3, True, 0),
+        (3, 2, 2, True, 0),
+        (2, 0, 0, False, 0),
+        (1, 0, 0, False, 0),
+        (1, 0, 0, True, 1),
     ],
 )
-def test_basic(mpisize, execute_args, retcode, mpirun):
+def test_basic(mpisize, crank, srank, xworkers, retcode, mpirun):
     script_file = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), "execute_basic.py"
     )
 
-    execute_args += ["-m", str(mpisize)]
+    script_args = [str(v) for v in (mpisize, crank, srank, xworkers)]
     p = subprocess.Popen(
-        mpirun + ["-n", str(mpisize), sys.executable, script_file] + execute_args
+        mpirun + ["-n", script_args[0], sys.executable, script_file] + script_args
     )
 
     p.communicate()

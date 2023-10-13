@@ -10,10 +10,15 @@ from .initialize import send_close_signal
 
 
 def execute(
-    func,
-    *args,
-    client_rank=None,
+    client_function=None,
+    client_args=(),
+    client_kwargs=None,
+    client_rank=1,
+    scheduler=True,
     scheduler_rank=0,
+    scheduler_address=None,
+    scheduler_port=None,
+    scheduler_file=None,
     interface=None,
     nthreads=1,
     local_directory="",
@@ -27,7 +32,6 @@ def execute(
     worker_options=None,
     worker_name=None,
     comm=None,
-    **kwargs,
 ):
     """
     Execute a function on a given MPI rank with a Dask cluster launched using mpi4py
@@ -53,6 +57,12 @@ def execute(
         The MPI rank on which to run func.
     scheduler_rank : int
         The MPI rank on which to run the Dask scheduler
+    scheduler_address : str
+        IP Address of the scheduler, used if scheduler is not launched
+    scheduler_port : int
+        Specify scheduler port number.  Defaults to random.
+    scheduler_file : str
+        Filename to JSON encoded scheduler information.
     interface : str
         Network interface like 'eth0' or 'ib0'
     nthreads : int
@@ -103,11 +113,13 @@ def execute(
         worker_options = {}
 
     async def run_client():
-        def wrapped_func(*args, **kwargs):
-            func(*args, **kwargs)
+        def wrapped_function(*args, **kwargs):
+            client_function(*args, **kwargs)
             send_close_signal()
 
-        threading.Thread(target=wrapped_func, args=args, kwargs=kwargs).start()
+        threading.Thread(
+            target=wrapped_function, args=client_args, kwargs=client_kwargs
+        ).start()
 
     async def run_worker(with_client=False):
         WorkerType = import_term(worker_class)
@@ -122,9 +134,11 @@ def execute(
             "nthreads": nthreads,
             "memory_limit": memory_limit,
             "local_directory": local_directory,
-            "name": rank if worker_name else f"{worker_name}-{rank}",
+            "name": rank if not worker_name else f"{worker_name}-{rank}",
             **worker_options,
         }
+        if not scheduler and scheduler_address:
+            opts["scheduler_ip"] = scheduler_address
         async with WorkerType(**opts) as worker:
             if with_client:
                 asyncio.get_event_loop().create_task(run_client())
@@ -137,6 +151,8 @@ def execute(
             protocol=protocol,
             dashboard=dashboard,
             dashboard_address=dashboard_address,
+            scheduler_file=scheduler_file,
+            port=scheduler_port,
         ) as scheduler:
             dask.config.set(scheduler_address=scheduler.address)
             comm.bcast(scheduler.address, root=scheduler_rank)
@@ -152,8 +168,8 @@ def execute(
 
             await scheduler.finished()
 
-    with_scheduler = rank == scheduler_rank
-    with_client = callable(func) and (rank == client_rank)
+    with_scheduler = scheduler and (rank == scheduler_rank)
+    with_client = callable(client_function) and (rank == client_rank)
 
     if with_scheduler:
         run_coro = run_scheduler(
@@ -162,7 +178,12 @@ def execute(
         )
 
     else:
-        scheduler_address = comm.bcast(None, root=scheduler_rank)
+        if scheduler:
+            scheduler_address = comm.bcast(None, root=scheduler_rank)
+        elif scheduler_address is None:
+            raise ValueError(
+                "Must provide scheduler_address if executing with scheduler=False"
+            )
         dask.config.set(scheduler_address=scheduler_address)
         comm.Barrier()
 
