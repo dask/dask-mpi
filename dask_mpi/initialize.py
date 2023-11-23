@@ -3,10 +3,11 @@ import atexit
 import sys
 
 import dask
-from distributed import Client, Nanny, Scheduler
+from distributed import Nanny, Scheduler
 from distributed.utils import import_term
 
 from .exceptions import WorldTooSmallException
+from .execute import send_close_signal
 
 
 def initialize(
@@ -121,10 +122,10 @@ def initialize(
         async def run_worker():
             WorkerType = import_term(worker_class)
             if nanny:
+                WorkerType = Nanny
                 raise DeprecationWarning(
                     "Option nanny=True is deprectaed, use worker_class='distributed.Nanny' instead"
                 )
-                WorkerType = Nanny
             opts = {
                 "interface": interface,
                 "protocol": protocol,
@@ -142,19 +143,3 @@ def initialize(
             sys.exit()
         else:
             return False
-
-
-def send_close_signal():
-    """
-    The client can call this function to explicitly stop
-    the event loop.
-
-    This is not needed in normal usage, where it is run
-    automatically when the client code exits python.
-
-    You only need to call this manually when using exit=False
-    in initialize.
-    """
-
-    with Client() as c:
-        c.shutdown()

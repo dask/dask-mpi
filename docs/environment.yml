@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python<3.12
   - dask>=2.19
   - distributed>=2.19
   - mpich

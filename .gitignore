@@ -115,6 +115,7 @@ global.lock
 purge.lock
 /temp/
 /dask-worker-space/
+/dask-scratch-space/
 
 # VSCode files
 .vscode/
