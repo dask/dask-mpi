@@ -6,12 +6,14 @@ import dask
 from distributed import Client, Nanny, Scheduler
 from distributed.utils import import_term
 
+from .exceptions import WorldTooSmallException
+
 
 def initialize(
     comm,
     interface=None,
     nthreads=1,
-    local_directory="",
+    local_directory=None,
     memory_limit="auto",
     nanny=False,
     dashboard=True,
@@ -42,7 +44,7 @@ def initialize(
         Network interface like 'eth0' or 'ib0'
     nthreads : int
         Number of threads per worker
-    local_directory : str
+    local_directory : str or None
         Directory to place worker files
     memory_limit : int, float, or 'auto'
         Number of bytes before spilling data to disk.  This can be an
@@ -72,6 +74,13 @@ def initialize(
     assert (
         comm is not None
     ), "MPI Comm World needs to be created before import distributed."
+
+    world_size = comm.Get_size()
+    if world_size < 3:
+        raise WorldTooSmallException(
+            f"Not enough MPI ranks to start cluster, found {world_size}, "
+            "needs at least 3, one each for the scheduler, client and a worker."
+        )
 
     rank = comm.Get_rank()
 

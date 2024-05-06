@@ -6,6 +6,8 @@ from distributed import Scheduler, Worker
 from distributed.utils import import_term
 from mpi4py import MPI
 
+from .exceptions import WorldTooSmallException
+
 
 @click.command()
 @click.argument("scheduler_address", type=str, required=False)
@@ -94,8 +96,15 @@ def main(
     protocol,
     name,
 ):
-
     comm = MPI.COMM_WORLD
+
+    world_size = comm.Get_size()
+    if scheduler and world_size < 2:
+        raise WorldTooSmallException(
+            f"Not enough MPI ranks to start cluster, found {world_size}, "
+            "needs at least 2, one each for the scheduler and a worker."
+        )
+
     rank = comm.Get_rank()
 
     try:
@@ -122,7 +131,6 @@ def main(
         comm.Barrier()
 
         async def run_worker():
-
             WorkerType = import_term(worker_class)
             if not nanny:
                 raise DeprecationWarning(

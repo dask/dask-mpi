@@ -31,7 +31,6 @@ def test_basic(loop, worker_class, mpirun):
             "Cannot import {}, perhaps it is not installed".format(worker_class)
         )
     with tmpfile(extension="json") as fn:
-
         cmd = mpirun + [
             "-np",
             "4",
@@ -52,14 +51,30 @@ def test_basic(loop, worker_class, mpirun):
                 assert c.submit(lambda x: x + 1, 10).result() == 11
 
 
+def test_small_world(mpirun):
+    with tmpfile(extension="json") as fn:
+        # Set too few processes to start cluster
+        p = subprocess.Popen(
+            mpirun
+            + [
+                "-np",
+                "1",
+                "dask-mpi",
+                "--scheduler-file",
+                fn,
+            ]
+        )
+
+        p.communicate()
+        assert p.returncode != 0
+
+
 def test_no_scheduler(loop, mpirun):
     with tmpfile(extension="json") as fn:
-
         cmd = mpirun + ["-np", "2", "dask-mpi", "--scheduler-file", fn]
 
         with popen(cmd, stdin=FNULL):
             with Client(scheduler_file=fn) as c:
-
                 start = time()
                 while len(c.scheduler_info()["workers"]) != 1:
                     assert time() < start + 10
@@ -86,7 +101,6 @@ def test_no_scheduler(loop, mpirun):
 @pytest.mark.parametrize("nanny", ["--nanny", "--no-nanny"])
 def test_non_default_ports(loop, nanny, mpirun):
     with tmpfile(extension="json") as fn:
-
         cmd = mpirun + [
             "-np",
             "2",
@@ -119,7 +133,6 @@ def check_port_okay(port):
 
 def test_dashboard(loop, mpirun):
     with tmpfile(extension="json") as fn:
-
         cmd = mpirun + [
             "-np",
             "2",
@@ -140,7 +153,6 @@ def test_dashboard(loop, mpirun):
 @pytest.mark.skip(reason="Should we expose this option?")
 def test_bokeh_worker(loop, mpirun):
     with tmpfile(extension="json") as fn:
-
         cmd = mpirun + [
             "-np",
             "2",
