@@ -69,6 +69,13 @@ from .exceptions import WorldTooSmallException
     help="JSON serialised dict of options to pass to workers",
 )
 @click.option(
+    "--dashboard/--no-dashboard",
+    "dashboard",
+    default=True,
+    required=False,
+    help="Launch the Dashboard [default: --dashboard]",
+)
+@click.option(
     "--dashboard-address",
     type=str,
     default=None,
@@ -88,6 +95,7 @@ def main(
     local_directory,
     memory_limit,
     scheduler,
+    dashboard,
     dashboard_address,
     nanny,
     worker_class,
@@ -118,6 +126,7 @@ def main(
             async with Scheduler(
                 interface=interface,
                 protocol=protocol,
+                dashboard=dashboard,
                 dashboard_address=dashboard_address,
                 scheduler_file=scheduler_file,
                 port=scheduler_port,
