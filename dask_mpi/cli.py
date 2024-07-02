@@ -83,6 +83,13 @@ from .exceptions import WorldTooSmallException
     help="JSON serialised dict of options to pass to workers",
 )
 @click.option(
+    "--dashboard/--no-dashboard",
+    "dashboard",
+    default=True,
+    required=False,
+    help="Launch the Dashboard [default: --dashboard]",
+)
+@click.option(
     "--dashboard-address",
     type=str,
     default=None,
@@ -105,11 +112,12 @@ def main(
     memory_limit,
     local_directory,
     scheduler,
+    dashboard,
+    dashboard_address,
     nanny,
     exclusive_workers,
     worker_class,
     worker_options,
-    dashboard_address,
     name,
 ):
     comm = MPI.COMM_WORLD
@@ -156,6 +164,7 @@ def main(
         async with Scheduler(
             interface=interface,
             protocol=protocol,
+            dashboard=dashboard,
             dashboard_address=dashboard_address,
             scheduler_file=scheduler_file,
             port=scheduler_port,

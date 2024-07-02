@@ -13,7 +13,7 @@ from .execute import send_close_signal
 def initialize(
     interface=None,
     nthreads=1,
-    local_directory="",
+    local_directory=None,
     memory_limit="auto",
     nanny=False,
     dashboard=True,
@@ -43,7 +43,7 @@ def initialize(
         Network interface like 'eth0' or 'ib0'
     nthreads : int
         Number of threads per worker
-    local_directory : str
+    local_directory : str or None
         Directory to place worker files
     memory_limit : int, float, or 'auto'
         Number of bytes before spilling data to disk.  This can be an
