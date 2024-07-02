@@ -8,7 +8,7 @@ dependencies:
   - mpich
   - mpi4py>=3.0.3
   - versioneer
-  - sphinx
+  - sphinx>=5.0
   - pygments
   - pip
   - pip:
