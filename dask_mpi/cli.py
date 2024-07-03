@@ -24,6 +24,12 @@ from .exceptions import WorldTooSmallException
     help="Specify scheduler port number.  Defaults to random.",
 )
 @click.option(
+    "--scheduler-rank",
+    default=0,
+    type=int,
+    help="The MPI rank on which the scheduler will launch.  Defaults to 0.",
+)
+@click.option(
     "--interface", type=str, default=None, help="Network interface like 'eth0' or 'ib0'"
 )
 @click.option(
@@ -55,6 +61,14 @@ from .exceptions import WorldTooSmallException
     "--nanny/--no-nanny",
     default=True,
     help="Start workers in nanny process for management (deprecated use --worker-class instead)",
+)
+@click.option(
+    "--exclusive-workers/--inclusive-workers",
+    default=True,
+    help=(
+        "Whether to force workers to run on unoccupied MPI ranks.  If false, "
+        "then a worker will be launched on the same rank as the scheduler."
+    ),
 )
 @click.option(
     "--worker-class",
@@ -90,27 +104,30 @@ from .exceptions import WorldTooSmallException
 def main(
     scheduler_address,
     scheduler_file,
+    scheduler_port,
+    scheduler_rank,
     interface,
+    protocol,
     nthreads,
-    local_directory,
     memory_limit,
+    local_directory,
     scheduler,
     dashboard,
     dashboard_address,
     nanny,
+    exclusive_workers,
     worker_class,
     worker_options,
-    scheduler_port,
-    protocol,
     name,
 ):
     comm = MPI.COMM_WORLD
 
     world_size = comm.Get_size()
-    if scheduler and world_size < 2:
+    min_world_size = 1 + scheduler * max(scheduler_rank, exclusive_workers)
+    if world_size < min_world_size:
         raise WorldTooSmallException(
-            f"Not enough MPI ranks to start cluster, found {world_size}, "
-            "needs at least 2, one each for the scheduler and a worker."
+            f"Not enough MPI ranks to start cluster with exclusive_workers={exclusive_workers} and "
+            f"scheduler_rank={scheduler_rank}, found {world_size} MPI ranks but needs {min_world_size}."
         )
 
     rank = comm.Get_rank()
@@ -120,46 +137,51 @@ def main(
     except TypeError:
         worker_options = {}
 
-    if rank == 0 and scheduler:
+    async def run_worker():
+        WorkerType = import_term(worker_class)
+        if not nanny:
+            WorkerType = Worker
+            raise DeprecationWarning(
+                "Option --no-nanny is deprectaed, use --worker-class instead"
+            )
+        opts = {
+            "interface": interface,
+            "protocol": protocol,
+            "nthreads": nthreads,
+            "memory_limit": memory_limit,
+            "local_directory": local_directory,
+            "name": f"{name}-{rank}",
+            "scheduler_file": scheduler_file,
+            **worker_options,
+        }
+        if scheduler_address:
+            opts["scheduler_ip"] = scheduler_address
 
-        async def run_scheduler():
-            async with Scheduler(
-                interface=interface,
-                protocol=protocol,
-                dashboard=dashboard,
-                dashboard_address=dashboard_address,
-                scheduler_file=scheduler_file,
-                port=scheduler_port,
-            ) as s:
-                comm.Barrier()
-                await s.finished()
+        async with WorkerType(**opts) as worker:
+            await worker.finished()
 
-        asyncio.get_event_loop().run_until_complete(run_scheduler())
+    async def run_scheduler(launch_worker=False):
+        async with Scheduler(
+            interface=interface,
+            protocol=protocol,
+            dashboard=dashboard,
+            dashboard_address=dashboard_address,
+            scheduler_file=scheduler_file,
+            port=scheduler_port,
+        ) as scheduler:
+            comm.Barrier()
 
+            if launch_worker:
+                asyncio.get_event_loop().create_task(run_worker())
+
+            await scheduler.finished()
+
+    if rank == scheduler_rank and scheduler:
+        asyncio.get_event_loop().run_until_complete(
+            run_scheduler(launch_worker=not exclusive_workers)
+        )
     else:
         comm.Barrier()
-
-        async def run_worker():
-            WorkerType = import_term(worker_class)
-            if not nanny:
-                raise DeprecationWarning(
-                    "Option --no-nanny is deprectaed, use --worker-class instead"
-                )
-                WorkerType = Worker
-            opts = {
-                "interface": interface,
-                "protocol": protocol,
-                "nthreads": nthreads,
-                "memory_limit": memory_limit,
-                "local_directory": local_directory,
-                "name": f"{name}-{rank}",
-                "scheduler_file": scheduler_file,
-                **worker_options,
-            }
-            if scheduler_address:
-                opts["scheduler_ip"] = scheduler_address
-            async with WorkerType(**opts) as worker:
-                await worker.finished()
 
         asyncio.get_event_loop().run_until_complete(run_worker())
 

@@ -3,15 +3,23 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python<3.12
   - dask>=2.19
   - distributed>=2.19
   - mpich
   - mpi4py>=3.0.3
   - versioneer
-  - sphinx>=5.0
+  - sphinx
   - pygments
   - pip
   - pip:
+      #>>>> See: https://github.com/dask/dask-sphinx-theme/issues/68
+      - sphinxcontrib-applehelp<1.0.5
+      - sphinxcontrib-devhelp<1.0.6
+      - sphinxcontrib-htmlhelp<2.0.5
+      - sphinxcontrib-serializinghtml<1.1.10
+      - sphinxcontrib-qthelp<1.0.7
+      #<<<<
       - dask-sphinx-theme>=3.0.5
       - numpydoc
       - sphinx-click
