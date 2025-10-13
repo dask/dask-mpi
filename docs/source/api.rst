@@ -1,4 +1,4 @@
-.. currentmodule:: dask_mpi.core
+.. currentmodule:: dask_mpi
 
 .. _api:
 
