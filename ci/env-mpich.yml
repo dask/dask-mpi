@@ -1,7 +1,7 @@
 name: dask-mpi-dev
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - dask>=2.19
   - distributed>=2.19
