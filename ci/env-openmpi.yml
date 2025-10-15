@@ -8,7 +8,6 @@ dependencies:
   - openmpi
   - mpi4py>=3.0.3
   - pytest
-  - pytest-icdiff
   - pytest-cov
   - coverage
   - requests
