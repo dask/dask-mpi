@@ -10,10 +10,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.13"
 
       - name: Install pypa/build
         run: python -m pip install build wheel pyyaml
@@ -24,7 +24,7 @@ jobs:
 
       - name: Publish package to PyPI
         if: github.repository == 'dask/dask-mpi' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
