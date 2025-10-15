@@ -1,0 +1,8 @@
+# These will be overridden by the publish workflow and set to the new tag
+exclude-contributors:
+  - pre-commit-ci
+
+template: |
+  ## Changes
+
+  $CHANGES  
