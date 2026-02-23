@@ -16,11 +16,11 @@ jobs:
           python-version: "3.13"
 
       - name: Install pypa/build
-        run: python -m pip install setuptools build wheel pyyaml
+        run: python -m pip install build
 
       - name: Build distributions
         shell: bash -l {0}
-        run: python setup.py sdist bdist_wheel
+        run: python -m build
 
       - name: Publish package to PyPI
         if: github.repository == 'dask/dask-mpi' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')

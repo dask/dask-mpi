@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dask-mpi"
+dynamic = ["version"]
+description = "Deploy Dask using mpi4py"
+readme = "README.rst"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+maintainers = [{ name = "Kevin Paul", email = "kpaul@ucar.edu" }]
+dependencies = [
+    "dask>=2.19",
+    "distributed>=2.19",
+    "mpi4py>=3.0.3",
+]
+
+[project.scripts]
+dask-mpi = "dask_mpi.cli:main"
+
+[project.urls]
+Documentation = "https://mpi.dask.org/"
+Source = "https://github.com/dask/dask-mpi"
+Tracker = "https://github.com/dask/dask-mpi/issues"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["dask_mpi"]
+
+[tool.pytest.ini_options]
+addopts = "-rsx -v --durations=10"
+minversion = "3.2"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.isort]
+known_third_party = ["click", "dask", "distributed", "mpi4py", "pytest", "requests", "setuptools", "yaml"]
+profile = "black"
