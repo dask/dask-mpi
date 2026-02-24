@@ -145,6 +145,7 @@ def execute(
             await worker.finished()
 
     async def run_scheduler(with_worker=False, with_client=False):
+        worker_task = None
         async with Scheduler(
             interface=interface,
             protocol=protocol,
@@ -158,12 +159,15 @@ def execute(
             comm.Barrier()
 
             if with_worker:
-                asyncio.ensure_future(run_worker(with_client=with_client))
+                worker_task = asyncio.ensure_future(run_worker(with_client=with_client))
 
             elif with_client:
                 asyncio.ensure_future(run_client())
 
             await scheduler.finished()
+
+        if worker_task is not None:
+            await worker_task
 
     with_scheduler = scheduler and (rank == scheduler_rank)
     with_client = callable(client_function) and (rank == client_rank)
