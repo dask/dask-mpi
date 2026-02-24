@@ -41,5 +41,5 @@ markers = [
 ]
 
 [tool.isort]
-known_third_party = ["click", "dask", "distributed", "mpi4py", "pytest", "requests", "setuptools", "yaml"]
+known_third_party = ["click", "dask", "distributed", "mpi4py", "pytest", "requests"]
 profile = "black"
