@@ -27,6 +27,9 @@ Tracker = "https://github.com/dask/dask-mpi/issues"
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.build.hooks.vcs]
+version-file = "dask_mpi/_version.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["dask_mpi"]
 
