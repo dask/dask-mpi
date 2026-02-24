@@ -4,7 +4,6 @@ import json
 import click
 from distributed import Scheduler, Worker
 from distributed.utils import import_term
-from mpi4py import MPI
 
 from .exceptions import WorldTooSmallException
 
@@ -120,6 +119,8 @@ def main(
     worker_options,
     name,
 ):
+    from mpi4py import MPI
+
     comm = MPI.COMM_WORLD
 
     world_size = comm.Get_size()
@@ -172,18 +173,16 @@ def main(
             comm.Barrier()
 
             if launch_worker:
-                asyncio.get_event_loop().create_task(run_worker())
+                asyncio.ensure_future(run_worker())
 
             await scheduler.finished()
 
     if rank == scheduler_rank and scheduler:
-        asyncio.get_event_loop().run_until_complete(
-            run_scheduler(launch_worker=not exclusive_workers)
-        )
+        asyncio.run(run_scheduler(launch_worker=not exclusive_workers))
     else:
         comm.Barrier()
 
-        asyncio.get_event_loop().run_until_complete(run_worker())
+        asyncio.run(run_worker())
 
 
 if __name__ == "__main__":

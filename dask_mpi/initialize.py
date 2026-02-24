@@ -102,7 +102,7 @@ def initialize(
                 comm.Barrier()
                 await scheduler.finished()
 
-        asyncio.get_event_loop().run_until_complete(run_scheduler())
+        asyncio.run(run_scheduler())
         if exit:
             sys.exit()
         else:
@@ -138,7 +138,7 @@ def initialize(
             async with WorkerType(**opts) as worker:
                 await worker.finished()
 
-        asyncio.get_event_loop().run_until_complete(run_worker())
+        asyncio.run(run_worker())
         if exit:
             sys.exit()
         else:
