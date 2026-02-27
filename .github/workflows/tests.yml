@@ -26,7 +26,10 @@ jobs:
       PYTHON: ${{ matrix.python }}
       MPI: ${{ matrix.mpi }}
       ENV_FILE: ci/env-${{ matrix.mpi }}.yml
-      OMPI_MCA_rmaps_base_oversubscribe: '1'
+      # OpenMPI 5.x removed --oversubscribe; use PRRTE's mapping policy instead
+      PRTE_MCA_rmaps_default_mapping_policy: ':OVERSUBSCRIBE'
+      # Disable CPU binding to avoid hangs on virtualized CI hardware (OpenMPI 5.x)
+      PRTE_MCA_rmaps_default_binding_policy: 'none'
       OMPI_ALLOW_RUN_AS_ROOT: '1'
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: '1'
     steps:
