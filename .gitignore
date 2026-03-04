@@ -124,3 +124,4 @@ purge.lock
 .devcontainer/
 
 test-reports/
+_version.py

@@ -140,11 +140,12 @@ def execute(
             opts["scheduler_ip"] = scheduler_address
         async with WorkerType(**opts) as worker:
             if with_client:
-                asyncio.get_event_loop().create_task(run_client())
+                asyncio.ensure_future(run_client())
 
             await worker.finished()
 
     async def run_scheduler(with_worker=False, with_client=False):
+        worker_task = None
         async with Scheduler(
             interface=interface,
             protocol=protocol,
@@ -158,14 +159,15 @@ def execute(
             comm.Barrier()
 
             if with_worker:
-                asyncio.get_event_loop().create_task(
-                    run_worker(with_client=with_client)
-                )
+                worker_task = asyncio.ensure_future(run_worker(with_client=with_client))
 
             elif with_client:
-                asyncio.get_event_loop().create_task(run_client())
+                asyncio.ensure_future(run_client())
 
             await scheduler.finished()
+
+        if worker_task is not None:
+            await worker_task
 
     with_scheduler = scheduler and (rank == scheduler_rank)
     with_client = callable(client_function) and (rank == client_rank)
@@ -191,7 +193,7 @@ def execute(
         else:
             run_coro = run_worker(with_client=with_client)
 
-    asyncio.get_event_loop().run_until_complete(run_coro)
+    asyncio.run(run_coro)
 
 
 def send_close_signal():
